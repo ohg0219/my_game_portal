@@ -1,109 +1,68 @@
-# 🐍 스네이크 게임
+# 🎮 미니 게임 포털 (Mini Game Portal)
 
-HTML, CSS, JavaScript로 제작된 클래식 스네이크 게임입니다.
+HTML, CSS, JavaScript로 제작된 간단한 미니 게임들을 모아놓은 웹 포털입니다.
 
 ## 🎮 게임 플레이
 
-**🔗 [게임 플레이하기](https://ohg0219.github.io/snake_game/)**
+**🔗 [게임 플레이하기](https://ohg0219.github.io/my_game_portal)**
 
 ## ✨ 주요 기능
 
-### 🎯 4단계 난이도
-- **초보**: 천천히 시작해보세요 (200ms)
-- **중수**: 적당한 속도로 (150ms)  
-- **고수**: 빠른 속도에 도전! (100ms)
-- **신**: 극한의 속도! (70ms)
+- **다양한 게임**: 여러가지 고전 미니 게임을 한 곳에서 즐길 수 있습니다.
+- **반응형 디자인**: 데스크톱, 태블릿, 모바일 등 모든 기기에서 최적화된 화면을 제공합니다.
+- **점수 시스템**: 각 게임별로 최고 점수를 기록하고 관리할 수 있습니다.
+- **쉬운 접근성**: 별도의 설치 없이 웹 브라우저만으로 바로 플레이할 수 있습니다.
 
-### 🎮 컨트롤
-- **키보드**: 방향키(↑↓←→)로 뱀 조종
-- **모바일**: 화면의 방향키 버튼 터치
-- **일시정지**: 게임 중 일시정지/재개 가능
+## 🎲 게임 목록
 
-### 📱 반응형 디자인
-- 데스크톱, 태블릿, 모바일 모든 기기에서 플레이 가능
-- 터치 스크린 완벽 지원
+현재 플레이할 수 있는 게임은 다음과 같습니다.
 
-### 🏆 점수 시스템
-- 음식을 먹을 때마다 10점 획득
-- 난이도별 최고 점수 기록
-- 로컬 저장으로 점수 유지
+### 🐍 스네이크 게임 (Snake Game)
+- 클래식한 스네이크 게임! 뱀을 조종해서 음식을 먹고 점수를 쌓아보세요. 4단계 난이도로 도전하세요!
+- **[플레이하기](https://ohg0219.github.io/my_game_portal/games/snake/index.html)**
 
-## 🎲 게임 규칙
+### 🧠 메모리 게임 (Memory Game)
+- 카드를 뒤집어서 같은 그림을 찾는 기억력 게임! 최소 횟수로 모든 카드를 맞춰보세요.
+- **[플레이하기](https://ohg0219.github.io/my_game_portal/games/memory/index.html)**
 
-1. **목표**: 뱀을 조종하여 빨간 음식을 먹고 점수를 획득하세요
-2. **성장**: 음식을 먹을 때마다 뱀의 길이가 늘어납니다
-3. **게임 오버**: 
-   - 벽에 부딪히면 게임 오버
-   - 자신의 몸통에 부딪히면 게임 오버
-4. **승리**: 최대한 높은 점수를 달성하세요!
+### 🔢 2048 게임 (2048 Game)
+- 숫자 타일을 합쳐서 2048을 만드는 퍼즐 게임! 간단하지만 중독성 있는 게임입니다.
+- **[플레이하기](https://ohg0219.github.io/my_game_portal/games/2048/index.html)**
 
 ## 🛠️ 기술 스택
 
 - **HTML5**: 게임 구조 및 Canvas API
 - **CSS3**: 반응형 디자인 및 애니메이션
-- **JavaScript**: 게임 로직 및 상호작용
+- **JavaScript (ES6+)**: 게임 로직 및 상호작용
 - **GitHub Pages**: 무료 호스팅
 
-## 📁 프로젝트 구조
+## 🚀 로컬에서 실행하기
 
-```
-snake_game/
-├── index.html          # 메인 게임 파일
-├── snake_game.css      # 스타일시트
-├── snake_game.js       # 게임 로직
-├── .nojekyll          # Jekyll 비활성화
-└── README.md          # 프로젝트 설명
-```
-
-## 🚀 로컬 실행 방법
-
-1. 저장소 클론
-```bash
-git clone https://github.com/ohg0219/snake_game.git
-```
-
-2. 디렉토리 이동
-```bash
-cd snake_game
-```
-
-3. 웹 서버로 실행 (예: Live Server, Python 서버 등)
-```bash
-# Python 3
-python -m http.server 8000
-
-# Node.js (http-server 패키지 필요)
-npx http-server
-```
-
-4. 브라우저에서 `http://localhost:8000` 접속
-
-## 🎯 향후 개선 계획
-
-- [ ] 사운드 효과 추가
-- [ ] 파워업 아이템 추가
-- [ ] 멀티플레이어 모드
-- [ ] 리더보드 시스템
-- [ ] 다양한 테마
-- [ ] 게임 통계 기능
+1.  이 저장소를 클론합니다.
+    ```bash
+    git clone https://github.com/ohg0219/my_game_portal.git
+    ```
+2.  프로젝트 디렉토리로 이동합니다.
+    ```bash
+    cd my_game_portal
+    ```
+3.  로컬 웹 서버를 실행합니다. (예: VS Code의 Live Server 확장 프로그램 또는 Python의 http.server)
+    ```bash
+    # Python 3가 설치되어 있는 경우
+    python -m http.server
+    ```
+4.  웹 브라우저를 열고 `http://localhost:8000` (또는 서버가 지정한 다른 포트)으로 접속합니다.
 
 ## 🤝 기여하기
 
-1. 이 저장소를 포크하세요
-2. 새로운 기능 브랜치를 만드세요 (`git checkout -b feature/새기능`)
-3. 변경사항을 커밋하세요 (`git commit -am '새 기능 추가'`)
-4. 브랜치에 푸시하세요 (`git push origin feature/새기능`)
-5. Pull Request를 열어주세요
+이 프로젝트에 기여하고 싶으신가요? 언제든지 환영합니다!
+
+1.  이 저장소를 포크(Fork)하세요.
+2.  새로운 기능이나 수정을 위한 브랜치를 만드세요. (`git checkout -b feature/awesome-new-feature`)
+3.  변경사항을 커밋하세요. (`git commit -m 'Add some awesome feature'`)
+4.  브랜치에 푸시하세요. (`git push origin feature/awesome-new-feature`)
+5.  Pull Request 를 생성해주세요.
 
 ## 📄 라이선스
 
-이 프로젝트는 MIT 라이선스 하에 있습니다. 자세한 내용은 [LICENSE](LICENSE) 파일을 참조하세요.
-
-## 📞 연락처
-
-- GitHub: [@ohg0219](https://github.com/ohg0219)
-- 프로젝트 링크: [https://github.com/ohg0219/snake_game](https://github.com/ohg0219/snake_game)
-
----
-
-⭐ 이 프로젝트가 마음에 들으셨다면 별표를 눌러주세요!
+이 프로젝트는 MIT 라이선스를 따릅니다.
