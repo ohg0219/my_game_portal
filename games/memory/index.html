@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🧠 메모리 게임 - 준비중</title>
+    <title>🧠 메모리 게임</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -13,59 +13,84 @@
             <a href="../../" class="back-link">🏠 게임 목록으로</a>
         </div>
 
-        <div class="coming-soon">
-            <div class="game-icon">🧠</div>
-            <h1>메모리 게임</h1>
-            <h2>곧 출시됩니다!</h2>
-            
-            <div class="description">
-                <p>카드를 뒤집어서 같은 그림을 찾는 기억력 게임이 준비중입니다.</p>
-                <p>최소 횟수로 모든 카드를 맞춰보세요!</p>
-            </div>
-
-            <div class="preview-features">
-                <h3>✨ 예정된 기능들</h3>
-                <ul>
-                    <li>🎯 다양한 난이도 (4x4, 6x6, 8x8)</li>
-                    <li>🎨 아름다운 카드 디자인</li>
-                    <li>⏱️ 시간 기록 및 최고 기록</li>
-                    <li>🏆 점수 시스템</li>
-                    <li>📱 모바일 터치 지원</li>
-                    <li>🎵 효과음 (선택사항)</li>
-                </ul>
-            </div>
-
-            <div class="progress">
-                <h3>🚧 개발 진행률</h3>
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: 15%"></div>
+        <!-- 게임 헤더 -->
+        <div class="game-header">
+            <h1>🧠 메모리 게임</h1>
+            <div class="game-stats">
+                <div class="stat">
+                    <span class="stat-label">시간</span>
+                    <span class="stat-value" id="timer">00:00</span>
                 </div>
-                <p class="progress-text">15% 완료</p>
-            </div>
-
-            <div class="buttons">
-                <button class="notify-btn" onclick="showNotification()">
-                    🔔 출시 알림 받기
-                </button>
-                <a href="../snake/index.html" class="play-other-btn">
-                    🐍 스네이크 게임 하기
-                </a>
+                <div class="stat">
+                    <span class="stat-label">시도</span>
+                    <span class="stat-value" id="attempts">0</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">매치</span>
+                    <span class="stat-value" id="matches">0/8</span>
+                </div>
             </div>
         </div>
 
-        <div class="beta-preview">
-            <h3>🎮 미리보기</h3>
-            <div class="preview-grid">
-                <div class="preview-card flipped">🎭</div>
-                <div class="preview-card">❓</div>
-                <div class="preview-card">❓</div>
-                <div class="preview-card flipped">🎨</div>
-                <div class="preview-card">❓</div>
-                <div class="preview-card">❓</div>
-                <div class="preview-card flipped">🎭</div>
-                <div class="preview-card">❓</div>
+        <!-- 난이도 선택 -->
+        <div class="difficulty-selector" id="difficultySelector">
+            <h2>난이도를 선택하세요</h2>
+            <div class="difficulty-buttons">
+                <button class="difficulty-btn" data-level="easy">
+                    <span class="diff-icon">🟢</span>
+                    <span class="diff-name">쉬움</span>
+                    <span class="diff-desc">4x4 (8쌍)</span>
+                </button>
+                <button class="difficulty-btn" data-level="medium">
+                    <span class="diff-icon">🟡</span>
+                    <span class="diff-name">보통</span>
+                    <span class="diff-desc">4x5 (10쌍)</span>
+                </button>
+                <button class="difficulty-btn" data-level="hard">
+                    <span class="diff-icon">🔴</span>
+                    <span class="diff-name">어려움</span>
+                    <span class="diff-desc">6x6 (18쌍)</span>
+                </button>
             </div>
-            <p class="preview-note">* 실제 게임과 다를 수 있습니다</p>
+        </div>
+
+        <!-- 게임 보드 -->
+        <div class="game-board" id="gameBoard" style="display: none;">
+            <div class="memory-grid" id="memoryGrid"></div>
+        </div>
+
+        <!-- 게임 컨트롤 -->
+        <div class="game-controls" id="gameControls" style="display: none;">
+            <button class="control-btn" id="newGameBtn">새 게임</button>
+            <button class="control-btn" id="pauseBtn">일시정지</button>
+        </div>
+
+        <!-- 게임 완료 모달 -->
+        <div class="modal" id="gameCompleteModal">
+            <div class="modal-content">
+                <h2>🎉 축하합니다!</h2>
+                <div class="final-stats">
+                    <p>시간: <span id="finalTime"></span></p>
+                    <p>시도 횟수: <span id="finalAttempts"></span></p>
+                    <p>정확도: <span id="accuracy"></span>%</p>
+                </div>
+                <div class="modal-buttons">
+                    <button class="modal-btn" id="playAgainBtn">다시 하기</button>
+                    <button class="modal-btn" id="changeDifficultyBtn">난이도 변경</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 일시정지 모달 -->
+        <div class="modal" id="pauseModal">
+            <div class="modal-content">
+                <h2>⏸️ 일시정지</h2>
+                <p>게임이 일시정지되었습니다.</p>
+                <div class="modal-buttons">
+                    <button class="modal-btn" id="resumeBtn">계속하기</button>
+                    <button class="modal-btn" id="quitBtn">그만두기</button>
+                </div>
+            </div>
         </div>
     </div>
 
