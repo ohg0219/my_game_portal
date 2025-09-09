@@ -20,10 +20,11 @@
   BHGame.Util.inherits(Ship, BHGame.MovingObject);
 
   Ship.prototype.draw = function(ctx) {
+    const size = 30 * BHGame.config.scale;
     ctx.save();
     ctx.translate(this.pos[0], this.pos[1]);
     ctx.rotate(-Math.PI / 4); // Rotate -45 degrees
-    ctx.font = "30px Arial";
+    ctx.font = `${size}px Arial`;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillText("🚀", 0, 0);
