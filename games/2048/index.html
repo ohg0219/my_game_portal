@@ -3,101 +3,121 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🔢 2048 게임 - 준비중</title>
+    <title>🔢 2048 게임</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
-        <!-- 홈으로 돌아가기 버튼 -->
-        <div class="back-button">
-            <a href="../../" class="back-link">🏠 게임 목록으로</a>
+        <!-- 헤더 -->
+        <div class="header">
+            <div class="back-button">
+                <a href="../../" class="back-link">🏠 게임 목록으로</a>
+            </div>
+            <h1>2048</h1>
+            <p class="subtitle">타일을 합쳐서 2048을 만드세요!</p>
         </div>
 
-        <div class="coming-soon">
-            <div class="game-icon">🔢</div>
-            <h1>2048 게임</h1>
-            <h2>개발 진행중!</h2>
-            
-            <div class="description">
-                <p>숫자 타일을 합쳐서 2048을 만드는 퍼즐 게임이 준비중입니다.</p>
-                <p>간단하지만 중독성 있는 게임을 곧 만나보세요!</p>
-            </div>
-
-            <div class="preview-features">
-                <h3>🎯 예정된 기능들</h3>
-                <ul>
-                    <li>🎮 직관적인 스와이프/키보드 조작</li>
-                    <li>🏆 최고 점수 및 최고 타일 기록</li>
-                    <li>↩️ 실행 취소 기능 (제한적)</li>
-                    <li>🎨 아름다운 타일 애니메이션</li>
-                    <li>📱 모바일 터치 최적화</li>
-                    <li>🎵 타일 합치기 효과음</li>
-                    <li>📊 게임 통계 및 분석</li>
-                </ul>
-            </div>
-
-            <div class="preview-grid-container">
-                <h3>🎮 게임 미리보기</h3>
-                <div class="game-preview">
-                    <div class="tile-grid">
-                        <div class="tile tile-2" data-value="2">2</div>
-                        <div class="tile tile-4" data-value="4">4</div>
-                        <div class="tile tile-8" data-value="8">8</div>
-                        <div class="tile tile-16" data-value="16">16</div>
-                        <div class="tile tile-32" data-value="32">32</div>
-                        <div class="tile tile-64" data-value="64">64</div>
-                        <div class="tile tile-128" data-value="128">128</div>
-                        <div class="tile tile-256" data-value="256">256</div>
-                        <div class="tile tile-512" data-value="512">512</div>
-                        <div class="tile tile-1024" data-value="1024">1024</div>
-                        <div class="tile tile-2048" data-value="2048">2048</div>
-                        <div class="tile empty"></div>
-                        <div class="tile empty"></div>
-                        <div class="tile empty"></div>
-                        <div class="tile empty"></div>
-                        <div class="tile empty"></div>
-                    </div>
-                    <p class="preview-note">* 실제 게임 화면과 다를 수 있습니다</p>
+        <!-- 게임 정보 -->
+        <div class="game-info">
+            <div class="score-container">
+                <div class="score-box">
+                    <div class="score-label">점수</div>
+                    <div class="score-value" id="score">0</div>
+                </div>
+                <div class="score-box">
+                    <div class="score-label">최고점수</div>
+                    <div class="score-value" id="best-score">0</div>
                 </div>
             </div>
-
-            <div class="progress">
-                <h3>🚧 개발 진행률</h3>
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: 25%"></div>
-                </div>
-                <p class="progress-text">25% 완료</p>
-                <div class="progress-details">
-                    <div class="progress-item completed">✅ 기본 UI 디자인</div>
-                    <div class="progress-item in-progress">🔄 게임 로직 구현</div>
-                    <div class="progress-item pending">⏳ 애니메이션 효과</div>
-                    <div class="progress-item pending">⏳ 모바일 최적화</div>
-                </div>
-            </div>
-
-            <div class="buttons">
-                <button class="notify-btn" onclick="showNotification()">
-                    🔔 출시 알림 받기
-                </button>
-                <a href="../snake/index.html" class="play-other-btn">
-                    🐍 스네이크 게임 하기
-                </a>
+            <div class="game-controls">
+                <button class="btn" id="new-game-btn">새 게임</button>
+                <button class="btn" id="undo-btn" disabled>실행취소</button>
             </div>
         </div>
 
-        <div class="dev-notes">
-            <h3>👨‍💻 개발자 노트</h3>
-            <div class="note-item">
-                <span class="note-date">2025.09.09</span>
-                <span class="note-text">타일 디자인 및 색상 팔레트 완성</span>
+        <!-- 게임 보드 -->
+        <div class="game-container">
+            <div class="grid-container">
+                <div class="grid-row">
+                    <div class="grid-cell"></div>
+                    <div class="grid-cell"></div>
+                    <div class="grid-cell"></div>
+                    <div class="grid-cell"></div>
+                </div>
+                <div class="grid-row">
+                    <div class="grid-cell"></div>
+                    <div class="grid-cell"></div>
+                    <div class="grid-cell"></div>
+                    <div class="grid-cell"></div>
+                </div>
+                <div class="grid-row">
+                    <div class="grid-cell"></div>
+                    <div class="grid-cell"></div>
+                    <div class="grid-cell"></div>
+                    <div class="grid-cell"></div>
+                </div>
+                <div class="grid-row">
+                    <div class="grid-cell"></div>
+                    <div class="grid-cell"></div>
+                    <div class="grid-cell"></div>
+                    <div class="grid-cell"></div>
+                </div>
             </div>
-            <div class="note-item">
-                <span class="note-date">2025.09.09</span>
-                <span class="note-text">게임 보드 레이아웃 구현 시작</span>
+            <div class="tile-container" id="tile-container">
+                <!-- 타일들이 동적으로 생성됩니다 -->
             </div>
-            <div class="note-item">
-                <span class="note-date">2025.09.09</span>
-                <span class="note-text">타일 이동 로직 개발 중...</span>
+        </div>
+
+        <!-- 조작법 안내 -->
+        <div class="instructions">
+            <p><strong>조작법:</strong> 방향키나 WASD로 타일을 이동하세요</p>
+            <div class="mobile-instructions">
+                <p><strong>모바일:</strong> 스와이프해서 타일을 이동하세요</p>
+            </div>
+        </div>
+
+        <!-- 모바일 컨트롤 -->
+        <div class="mobile-controls">
+            <div class="control-row">
+                <button class="control-btn" data-direction="up">↑</button>
+            </div>
+            <div class="control-row">
+                <button class="control-btn" data-direction="left">←</button>
+                <button class="control-btn" data-direction="down">↓</button>
+                <button class="control-btn" data-direction="right">→</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 게임 오버 팝업 -->
+    <div class="game-over-overlay" id="game-over-overlay">
+        <div class="game-over-popup">
+            <h2 id="game-over-title">게임 오버!</h2>
+            <p id="game-over-message">더 이상 움직일 수 없습니다.</p>
+            <div class="final-score">
+                <p>최종 점수: <span id="final-score">0</span></p>
+                <p id="new-record" style="display: none;">🎉 새로운 최고 기록!</p>
+            </div>
+            <div class="game-over-buttons">
+                <button class="btn primary" id="try-again-btn">다시 시도</button>
+                <button class="btn" id="share-btn">점수 공유</button>
+                <a href="../../" class="btn">게임 목록으로</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 승리 팝업 -->
+    <div class="victory-overlay" id="victory-overlay">
+        <div class="victory-popup">
+            <h2>🎉 축하합니다!</h2>
+            <p>2048을 달성했습니다!</p>
+            <div class="victory-score">
+                <p>달성 점수: <span id="victory-score">0</span></p>
+            </div>
+            <div class="victory-buttons">
+                <button class="btn primary" id="keep-playing-btn">게임 계속하기</button>
+                <button class="btn" id="new-game-victory-btn">새 게임</button>
+                <a href="../../" class="btn">게임 목록으로</a>
             </div>
         </div>
     </div>

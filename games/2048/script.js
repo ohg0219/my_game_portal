@@ -1,331 +1,567 @@
-// 2048 게임 준비중 페이지 JavaScript
+// 2048 게임 JavaScript
 
-// 알림 받기 기능
-function showNotification() {
-    // 로컬 스토리지에 알림 설정 저장
-    localStorage.setItem('2048GameNotification', 'true');
+class Game2048 {
+    constructor() {
+        this.board = [];
+        this.score = 0;
+        this.bestScore = parseInt(localStorage.getItem('2048-best-score') || '0');
+        this.size = 4;
+        this.gameWon = false;
+        this.gameOver = false;
+        this.previousStates = [];
+        this.canUndo = false;
+        
+        this.init();
+    }
     
-    // 사용자에게 알림
-    alert('🔔 2048 게임 출시 알림이 설정되었습니다!\n게임이 완성되면 메인 페이지에서 알려드릴게요.');
+    init() {
+        this.setupBoard();
+        this.setupEventListeners();
+        this.updateDisplay();
+        this.addRandomTile();
+        this.addRandomTile();
+        this.renderBoard();
+    }
     
-    // 버튼 텍스트 변경
-    const button = document.querySelector('.notify-btn');
-    button.textContent = '✅ 알림 설정됨';
-    button.style.background = 'linear-gradient(45deg, #4caf50, #45a049)';
-    button.disabled = true;
-}
-
-// 타일 클릭 효과
-function initTileEffects() {
-    const tiles = document.querySelectorAll('.tile:not(.empty)');
+    setupBoard() {
+        this.board = [];
+        for (let i = 0; i < this.size; i++) {
+            this.board[i] = [];
+            for (let j = 0; j < this.size; j++) {
+                this.board[i][j] = 0;
+            }
+        }
+    }
     
-    tiles.forEach(tile => {
-        tile.addEventListener('click', function() {
-            // 타일 값 가져오기
-            const value = parseInt(this.textContent);
+    setupEventListeners() {
+        // 키보드 이벤트
+        document.addEventListener('keydown', (e) => {
+            if (this.gameOver) return;
             
-            // 클릭 효과
-            this.style.transform = 'scale(1.1)';
+            switch(e.key) {
+                case 'ArrowUp':
+                case 'w':
+                case 'W':
+                    e.preventDefault();
+                    this.move('up');
+                    break;
+                case 'ArrowDown':
+                case 's':
+                case 'S':
+                    e.preventDefault();
+                    this.move('down');
+                    break;
+                case 'ArrowLeft':
+                case 'a':
+                case 'A':
+                    e.preventDefault();
+                    this.move('left');
+                    break;
+                case 'ArrowRight':
+                case 'd':
+                case 'D':
+                    e.preventDefault();
+                    this.move('right');
+                    break;
+            }
+        });
+        
+        // 터치 이벤트
+        let startX, startY;
+        const gameContainer = document.querySelector('.game-container');
+        
+        gameContainer.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+        });
+        
+        gameContainer.addEventListener('touchend', (e) => {
+            if (!startX || !startY) return;
+            
+            const endX = e.changedTouches[0].clientX;
+            const endY = e.changedTouches[0].clientY;
+            
+            const diffX = startX - endX;
+            const diffY = startY - endY;
+            
+            const minSwipeDistance = 50;
+            
+            if (Math.abs(diffX) > Math.abs(diffY)) {
+                if (Math.abs(diffX) > minSwipeDistance) {
+                    if (diffX > 0) {
+                        this.move('left');
+                    } else {
+                        this.move('right');
+                    }
+                }
+            } else {
+                if (Math.abs(diffY) > minSwipeDistance) {
+                    if (diffY > 0) {
+                        this.move('up');
+                    } else {
+                        this.move('down');
+                    }
+                }
+            }
+            
+            startX = null;
+            startY = null;
+        });
+        
+        // 모바일 컨트롤 버튼
+        document.querySelectorAll('.control-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const direction = btn.getAttribute('data-direction');
+                this.move(direction);
+            });
+        });
+        
+        // 게임 컨트롤 버튼
+        document.getElementById('new-game-btn').addEventListener('click', () => {
+            this.newGame();
+        });
+        
+        document.getElementById('undo-btn').addEventListener('click', () => {
+            this.undo();
+        });
+        
+        // 팝업 버튼들
+        document.getElementById('try-again-btn').addEventListener('click', () => {
+            this.newGame();
+            this.hideGameOver();
+        });
+        
+        document.getElementById('keep-playing-btn').addEventListener('click', () => {
+            this.hideVictory();
+        });
+        
+        document.getElementById('new-game-victory-btn').addEventListener('click', () => {
+            this.newGame();
+            this.hideVictory();
+        });
+        
+        document.getElementById('share-btn').addEventListener('click', () => {
+            this.shareScore();
+        });
+    }
+    
+    addRandomTile() {
+        const emptyCells = [];
+        
+        for (let i = 0; i < this.size; i++) {
+            for (let j = 0; j < this.size; j++) {
+                if (this.board[i][j] === 0) {
+                    emptyCells.push({row: i, col: j});
+                }
+            }
+        }
+        
+        if (emptyCells.length > 0) {
+            const randomCell = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+            const value = Math.random() < 0.9 ? 2 : 4;
+            this.board[randomCell.row][randomCell.col] = value;
+        }
+    }
+    
+    move(direction) {
+        if (this.gameOver) return;
+        
+        this.saveState();
+        
+        let moved = false;
+        
+        switch(direction) {
+            case 'left':
+                moved = this.moveLeft();
+                break;
+            case 'right':
+                moved = this.moveRight();
+                break;
+            case 'up':
+                moved = this.moveUp();
+                break;
+            case 'down':
+                moved = this.moveDown();
+                break;
+        }
+        
+        if (moved) {
+            // 즉시 새 보드 렌더링 (애니메이션 포함)
+            this.renderBoard();
+            
+            // 새 타일 추가는 약간 지연
             setTimeout(() => {
-                this.style.transform = 'scale(1)';
-            }, 200);
-            
-            // 2048 타일 특별 효과
-            if (value === 2048) {
-                this.style.animation = 'glow 0.5s ease-in-out';
-                setTimeout(() => {
-                    this.style.animation = 'glow 2s infinite';
-                }, 500);
+                this.addRandomTile();
+                this.renderBoard();
+                this.updateDisplay();
+                this.canUndo = true;
+                document.getElementById('undo-btn').disabled = false;
                 
-                showCongratulations();
+                if (this.checkWin() && !this.gameWon) {
+                    this.gameWon = true;
+                    setTimeout(() => {
+                        this.showVictory();
+                    }, 200);
+                }
+                
+                if (this.checkGameOver()) {
+                    this.gameOver = true;
+                    setTimeout(() => {
+                        this.showGameOver();
+                    }, 200);
+                }
+            }, 200);
+        } else {
+            // 움직이지 않았으면 이전 상태 제거
+            this.previousStates.pop();
+        }
+    }
+    
+    moveLeft() {
+        let moved = false;
+        
+        for (let i = 0; i < this.size; i++) {
+            const row = this.board[i].filter(val => val !== 0);
+            const merged = [];
+            
+            for (let j = 0; j < row.length - 1; j++) {
+                if (row[j] === row[j + 1] && !merged[j] && !merged[j + 1]) {
+                    row[j] *= 2;
+                    this.score += row[j];
+                    row.splice(j + 1, 1);
+                    merged[j] = true;
+                }
             }
             
-            // 숫자 변화 시뮬레이션 (데모용)
-            if (value < 1024) {
-                setTimeout(() => {
-                    const nextValue = value * 2;
-                    this.textContent = nextValue;
-                    this.className = `tile tile-${nextValue}`;
-                    
-                    // 3초 후 원복
-                    setTimeout(() => {
-                        this.textContent = value;
-                        this.className = `tile tile-${value}`;
-                    }, 3000);
-                }, 500);
+            while (row.length < this.size) {
+                row.push(0);
             }
-        });
-    });
-}
-
-// 2048 달성 축하 메시지
-function showCongratulations() {
-    const congratsMsg = document.createElement('div');
-    congratsMsg.style.cssText = `
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: linear-gradient(45deg, #edc22e, #f7931e);
-        color: white;
-        padding: 20px 30px;
-        border-radius: 15px;
-        font-size: 1.2rem;
-        font-weight: bold;
-        z-index: 1000;
-        animation: bounce 0.5s ease-in-out;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-    `;
-    congratsMsg.textContent = '🎉 2048 달성! (미리보기)';
-    
-    document.body.appendChild(congratsMsg);
-    
-    setTimeout(() => {
-        document.body.removeChild(congratsMsg);
-    }, 2000);
-}
-
-// 진행률 애니메이션
-function animateProgress() {
-    const progressFill = document.querySelector('.progress-fill');
-    const progressText = document.querySelector('.progress-text');
-    
-    let progress = 0;
-    const targetProgress = 25;
-    
-    const interval = setInterval(() => {
-        progress += 1;
-        progressFill.style.width = progress + '%';
-        progressText.textContent = progress + '% 완료';
+            
+            for (let j = 0; j < this.size; j++) {
+                if (this.board[i][j] !== row[j]) {
+                    moved = true;
+                }
+                this.board[i][j] = row[j];
+            }
+        }
         
-        if (progress >= targetProgress) {
-            clearInterval(interval);
+        return moved;
+    }
+    
+    moveRight() {
+        let moved = false;
+        
+        for (let i = 0; i < this.size; i++) {
+            const row = this.board[i].filter(val => val !== 0);
+            const merged = [];
+            
+            for (let j = row.length - 1; j > 0; j--) {
+                if (row[j] === row[j - 1] && !merged[j] && !merged[j - 1]) {
+                    row[j] *= 2;
+                    this.score += row[j];
+                    row.splice(j - 1, 1);
+                    merged[j] = true;
+                }
+            }
+            
+            while (row.length < this.size) {
+                row.unshift(0);
+            }
+            
+            for (let j = 0; j < this.size; j++) {
+                if (this.board[i][j] !== row[j]) {
+                    moved = true;
+                }
+                this.board[i][j] = row[j];
+            }
         }
-    }, 50);
-}
-
-// 개발 진행률 업데이트
-function updateProgressItems() {
-    const progressItems = document.querySelectorAll('.progress-item');
+        
+        return moved;
+    }
     
-    // 순차적으로 상태 변경 시뮬레이션
-    setTimeout(() => {
-        if (progressItems[1]) {
-            progressItems[1].classList.remove('in-progress');
-            progressItems[1].classList.add('completed');
-            progressItems[1].innerHTML = '✅ 게임 로직 구현';
+    moveUp() {
+        let moved = false;
+        
+        for (let j = 0; j < this.size; j++) {
+            const column = [];
+            for (let i = 0; i < this.size; i++) {
+                if (this.board[i][j] !== 0) {
+                    column.push(this.board[i][j]);
+                }
+            }
+            
+            const merged = [];
+            for (let i = 0; i < column.length - 1; i++) {
+                if (column[i] === column[i + 1] && !merged[i] && !merged[i + 1]) {
+                    column[i] *= 2;
+                    this.score += column[i];
+                    column.splice(i + 1, 1);
+                    merged[i] = true;
+                }
+            }
+            
+            while (column.length < this.size) {
+                column.push(0);
+            }
+            
+            for (let i = 0; i < this.size; i++) {
+                if (this.board[i][j] !== column[i]) {
+                    moved = true;
+                }
+                this.board[i][j] = column[i];
+            }
         }
-    }, 3000);
+        
+        return moved;
+    }
     
-    setTimeout(() => {
-        if (progressItems[2]) {
-            progressItems[2].classList.remove('pending');
-            progressItems[2].classList.add('in-progress');
-            progressItems[2].innerHTML = '🔄 애니메이션 효과';
+    moveDown() {
+        let moved = false;
+        
+        for (let j = 0; j < this.size; j++) {
+            const column = [];
+            for (let i = 0; i < this.size; i++) {
+                if (this.board[i][j] !== 0) {
+                    column.push(this.board[i][j]);
+                }
+            }
+            
+            const merged = [];
+            for (let i = column.length - 1; i > 0; i--) {
+                if (column[i] === column[i - 1] && !merged[i] && !merged[i - 1]) {
+                    column[i] *= 2;
+                    this.score += column[i];
+                    column.splice(i - 1, 1);
+                    merged[i] = true;
+                }
+            }
+            
+            while (column.length < this.size) {
+                column.unshift(0);
+            }
+            
+            for (let i = 0; i < this.size; i++) {
+                if (this.board[i][j] !== column[i]) {
+                    moved = true;
+                }
+                this.board[i][j] = column[i];
+            }
         }
-    }, 6000);
-}
-
-// 개발자 노트 업데이트
-function updateDeveloperNotes() {
-    const today = new Date();
-    const dateStr = today.getFullYear() + '.' + 
-                   String(today.getMonth() + 1).padStart(2, '0') + '.' + 
-                   String(today.getDate()).padStart(2, '0');
+        
+        return moved;
+    }
     
-    const newNotes = [
-        { date: dateStr, text: '타일 병합 로직 구현 완료' },
-        { date: dateStr, text: '키보드 입력 처리 추가' },
-        { date: dateStr, text: '모바일 터치 이벤트 최적화 중...' }
-    ];
+    renderBoard() {
+        const container = document.getElementById('tile-container');
+        
+        // 기존 타일들 제거 (애니메이션과 함께)
+        const existingTiles = Array.from(container.children);
+        existingTiles.forEach(tile => {
+            tile.style.transition = 'all 0.15s ease-in-out';
+            tile.style.opacity = '0';
+            tile.style.transform += ' scale(0.9)';
+        });
+        
+        // 새 타일들 생성
+        setTimeout(() => {
+            container.innerHTML = '';
+            
+            for (let i = 0; i < this.size; i++) {
+                for (let j = 0; j < this.size; j++) {
+                    if (this.board[i][j] !== 0) {
+                        const tile = document.createElement('div');
+                        tile.className = `tile tile-${this.board[i][j]}`;
+                        tile.textContent = this.board[i][j];
+                        tile.setAttribute('data-row', i);
+                        tile.setAttribute('data-col', j);
+                        tile.setAttribute('data-value', this.board[i][j]);
+                        
+                        // 위치 계산
+                        const x = j * 115; // 100px + 15px gap
+                        const y = i * 115;
+                        
+                        // 시작은 약간 작게, 투명하게
+                        tile.style.transform = `translate(${x}px, ${y}px) scale(0.9)`;
+                        tile.style.opacity = '0';
+                        
+                        container.appendChild(tile);
+                        
+                        // 애니메이션으로 나타나기
+                        setTimeout(() => {
+                            tile.style.transition = 'all 0.15s ease-in-out';
+                            tile.style.transform = `translate(${x}px, ${y}px) scale(1)`;
+                            tile.style.opacity = '1';
+                        }, 10);
+                    }
+                }
+            }
+        }, 100);
+    }
     
-    let noteIndex = 0;
-    const interval = setInterval(() => {
-        if (noteIndex < newNotes.length) {
-            addDeveloperNote(newNotes[noteIndex]);
-            noteIndex++;
+    updateDisplay() {
+        document.getElementById('score').textContent = this.score;
+        document.getElementById('best-score').textContent = this.bestScore;
+        
+        if (this.score > this.bestScore) {
+            this.bestScore = this.score;
+            localStorage.setItem('2048-best-score', this.bestScore);
+            document.getElementById('best-score').classList.add('score-pop');
+            setTimeout(() => {
+                document.getElementById('best-score').classList.remove('score-pop');
+            }, 300);
+        }
+    }
+    
+    saveState() {
+        const state = {
+            board: this.board.map(row => [...row]),
+            score: this.score,
+            gameWon: this.gameWon,
+            gameOver: this.gameOver
+        };
+        this.previousStates.push(state);
+        
+        // 최대 10개의 이전 상태만 저장
+        if (this.previousStates.length > 10) {
+            this.previousStates.shift();
+        }
+    }
+    
+    undo() {
+        if (this.previousStates.length > 0 && this.canUndo) {
+            const previousState = this.previousStates.pop();
+            this.board = previousState.board;
+            this.score = previousState.score;
+            this.gameWon = previousState.gameWon;
+            this.gameOver = previousState.gameOver;
+            
+            this.renderBoard();
+            this.updateDisplay();
+            this.canUndo = false;
+            document.getElementById('undo-btn').disabled = true;
+        }
+    }
+    
+    checkWin() {
+        for (let i = 0; i < this.size; i++) {
+            for (let j = 0; j < this.size; j++) {
+                if (this.board[i][j] === 2048) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    
+    checkGameOver() {
+        // 빈 칸이 있으면 게임 오버가 아님
+        for (let i = 0; i < this.size; i++) {
+            for (let j = 0; j < this.size; j++) {
+                if (this.board[i][j] === 0) {
+                    return false;
+                }
+            }
+        }
+        
+        // 인접한 타일과 합칠 수 있으면 게임 오버가 아님
+        for (let i = 0; i < this.size; i++) {
+            for (let j = 0; j < this.size; j++) {
+                const current = this.board[i][j];
+                
+                // 오른쪽 타일 체크
+                if (j < this.size - 1 && this.board[i][j + 1] === current) {
+                    return false;
+                }
+                
+                // 아래쪽 타일 체크
+                if (i < this.size - 1 && this.board[i + 1][j] === current) {
+                    return false;
+                }
+            }
+        }
+        
+        return true;
+    }
+    
+    showGameOver() {
+        const overlay = document.getElementById('game-over-overlay');
+        const finalScore = document.getElementById('final-score');
+        const newRecord = document.getElementById('new-record');
+        
+        finalScore.textContent = this.score;
+        
+        if (this.score === this.bestScore && this.score > 0) {
+            newRecord.style.display = 'block';
         } else {
-            clearInterval(interval);
-        }
-    }, 4000);
-}
-
-// 개발자 노트 추가
-function addDeveloperNote(note) {
-    const devNotes = document.querySelector('.dev-notes');
-    const noteItem = document.createElement('div');
-    noteItem.className = 'note-item';
-    noteItem.style.opacity = '0';
-    noteItem.style.transform = 'translateY(20px)';
-    
-    noteItem.innerHTML = `
-        <span class="note-date">${note.date}</span>
-        <span class="note-text">${note.text}</span>
-    `;
-    
-    devNotes.appendChild(noteItem);
-    
-    // 애니메이션 효과
-    setTimeout(() => {
-        noteItem.style.transition = 'all 0.5s ease';
-        noteItem.style.opacity = '1';
-        noteItem.style.transform = 'translateY(0)';
-    }, 100);
-}
-
-// 키보드 단축키
-function addKeyboardShortcuts() {
-    document.addEventListener('keydown', function(e) {
-        // ESC: 메인 페이지로
-        if (e.key === 'Escape') {
-            window.location.href = '../../';
+            newRecord.style.display = 'none';
         }
         
-        // 스페이스바: 알림 설정
-        if (e.key === ' ') {
-            e.preventDefault();
-            showNotification();
-        }
-        
-        // 방향키: 게임 조작 미리보기
-        if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
-            e.preventDefault();
-            showDirectionPreview(e.key);
-        }
-        
-        // 숫자 1: 스네이크 게임으로
-        if (e.key === '1') {
-            window.location.href = '../snake/snake_game.html';
-        }
-        
-        // 숫자 2: 메모리 게임으로
-        if (e.key === '2') {
-            window.location.href = '../memory/index.html';
-        }
-    });
-}
-
-// 방향키 미리보기
-function showDirectionPreview(direction) {
-    const directionMap = {
-        'ArrowUp': '위로 스와이프',
-        'ArrowDown': '아래로 스와이프', 
-        'ArrowLeft': '왼쪽으로 스와이프',
-        'ArrowRight': '오른쪽으로 스와이프'
-    };
+        overlay.style.display = 'flex';
+    }
     
-    const preview = document.createElement('div');
-    preview.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: rgba(255, 107, 53, 0.9);
-        color: white;
-        padding: 10px 15px;
-        border-radius: 10px;
-        font-size: 0.9rem;
-        z-index: 1000;
-        animation: slideIn 0.3s ease-out;
-    `;
-    preview.textContent = `🎮 ${directionMap[direction]}`;
+    hideGameOver() {
+        document.getElementById('game-over-overlay').style.display = 'none';
+    }
     
-    document.body.appendChild(preview);
-    
-    setTimeout(() => {
-        document.body.removeChild(preview);
-    }, 1500);
-}
-
-// 타일 색상 미리보기
-function showTileColorDemo() {
-    const tiles = document.querySelectorAll('.tile:not(.empty)');
-    let currentIndex = 0;
-    
-    const interval = setInterval(() => {
-        // 이전 타일 원복
-        if (currentIndex > 0) {
-            tiles[currentIndex - 1].style.transform = 'scale(1)';
-        } else if (currentIndex === 0 && tiles.length > 0) {
-            tiles[tiles.length - 1].style.transform = 'scale(1)';
-        }
+    showVictory() {
+        const overlay = document.getElementById('victory-overlay');
+        const victoryScore = document.getElementById('victory-score');
         
-        // 현재 타일 강조
-        if (tiles[currentIndex]) {
-            tiles[currentIndex].style.transform = 'scale(1.1)';
-            tiles[currentIndex].style.transition = 'transform 0.3s ease';
-        }
-        
-        currentIndex = (currentIndex + 1) % tiles.length;
-    }, 800);
+        victoryScore.textContent = this.score;
+        overlay.style.display = 'flex';
+    }
     
-    // 10초 후 중지
-    setTimeout(() => {
-        clearInterval(interval);
-        tiles.forEach(tile => {
-            tile.style.transform = 'scale(1)';
-        });
-    }, 10000);
-}
-
-// 페이지 로드시 기존 알림 설정 확인
-function checkExistingNotification() {
-    if (localStorage.getItem('2048GameNotification') === 'true') {
-        const button = document.querySelector('.notify-btn');
-        button.textContent = '✅ 알림 설정됨';
-        button.style.background = 'linear-gradient(45deg, #4caf50, #45a049)';
-        button.disabled = true;
+    hideVictory() {
+        document.getElementById('victory-overlay').style.display = 'none';
+    }
+    
+    shareScore() {
+        const text = `2048 게임에서 ${this.score}점을 달성했습니다! 🎉`;
+        
+        if (navigator.share) {
+            navigator.share({
+                title: '2048 게임 점수',
+                text: text,
+                url: window.location.href
+            });
+        } else {
+            // Fallback: 클립보드에 복사
+            navigator.clipboard.writeText(text + ' ' + window.location.href).then(() => {
+                alert('점수가 클립보드에 복사되었습니다!');
+            }).catch(() => {
+                alert(`점수: ${this.score}점\n이 결과를 친구들과 공유해보세요!`);
+            });
+        }
+    }
+    
+    newGame() {
+        this.score = 0;
+        this.gameWon = false;
+        this.gameOver = false;
+        this.previousStates = [];
+        this.canUndo = false;
+        
+        document.getElementById('undo-btn').disabled = true;
+        
+        this.setupBoard();
+        this.addRandomTile();
+        this.addRandomTile();
+        this.renderBoard();
+        this.updateDisplay();
+        
+        this.hideGameOver();
+        this.hideVictory();
     }
 }
 
-// 게임 통계 시뮬레이션
-function simulateGameStats() {
-    console.log('📊 2048 게임 개발 통계:');
-    console.log('💻 코드 라인 수: 1,247줄');
-    console.log('🎨 디자인 완성도: 85%');
-    console.log('🐛 발견된 버그: 3개');
-    console.log('✅ 해결된 버그: 2개');
-    console.log('⏱️ 예상 완성 시간: 2-3일');
-}
-
-// 초기화 함수
-function init2048ComingSoon() {
-    checkExistingNotification();
-    initTileEffects();
-    animateProgress();
-    updateProgressItems();
-    addKeyboardShortcuts();
-    simulateGameStats();
+// 게임 시작
+document.addEventListener('DOMContentLoaded', () => {
+    const game = new Game2048();
     
-    // 지연 실행 함수들
-    setTimeout(() => {
-        showTileColorDemo();
-    }, 2000);
+    // 전역에서 접근 가능하도록
+    window.game2048 = game;
     
-    setTimeout(() => {
-        updateDeveloperNotes();
-    }, 5000);
-    
-    // 환영 메시지
-    console.log('🔢 2048 게임 준비중 페이지에 오신 것을 환영합니다!');
-    console.log('💡 팁: 방향키로 게임 조작 미리보기, 스페이스바로 알림 설정!');
-    console.log('🎯 타일을 클릭해서 미리보기를 체험해보세요!');
-}
-
-// 페이지 로드시 초기화
-document.addEventListener('DOMContentLoaded', init2048ComingSoon);
-
-// CSS 애니메이션 추가
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes slideIn {
-        from {
-            transform: translateX(100%);
-            opacity: 0;
-        }
-        to {
-            transform: translateX(0);
-            opacity: 1;
-        }
-    }
-`;
-document.head.appendChild(style);
+    console.log('🔢 2048 게임이 시작되었습니다!');
+    console.log('💡 조작법: 방향키 또는 WASD로 타일을 이동하세요');
+    console.log('🎯 목표: 타일을 합쳐서 2048을 만드세요!');
+});
