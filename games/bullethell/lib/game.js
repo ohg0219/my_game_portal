@@ -9,7 +9,7 @@
 
     this.score = 0;
     this.nextItemScore = 500;
-    this.deaths = 0;
+    this.lives = 3;
     this.stage = 1;
 
     this.gameOver = false;
@@ -90,7 +90,7 @@
     ctx.font = "16px Arial";
     ctx.fillStyle = "white";
     ctx.textAlign = "left";
-    ctx.fillText("LIVES: " + (3 - this.deaths), 10, 20);
+    ctx.fillText("LIVES: " + this.lives, 10, 20);
     ctx.textAlign = "right";
     ctx.fillText("SCORE: " + this.score, Game.DIM_X - 10, 20);
     ctx.textAlign = "center";
@@ -183,7 +183,8 @@
       const messages = {
           missile: "Missile Upgrade!",
           life: "+1 Life!",
-          shield: "Shield On!"
+          shield: "Shield On!",
+          fireRate: "Fire Rate Increased!"
       }
       this.powerUpMessage = messages[type] || "Power Up!";
       this.powerUpMessageTimer = 2; // 2 seconds

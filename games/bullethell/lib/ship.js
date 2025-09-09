@@ -18,6 +18,12 @@
     this.missileLevel = 1;
     this.isShielded = false;
     this.shieldTimer = 0;
+
+    // Life/Death properties
+    this.isDying = false;
+    this.deathTimer = 0;
+    this.isInvincible = false;
+    this.invincibleTimer = 0;
   });
 
   Ship.RADIUS = 15;
@@ -25,13 +31,30 @@
   BHGame.Util.inherits(Ship, BHGame.MovingObject);
 
   Ship.prototype.draw = function(ctx) {
+    if (this.isDying) {
+        const size = 60 * BHGame.config.scale;
+        ctx.font = `${size}px Arial`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText("💥", this.pos[0], this.pos[1]);
+        return;
+    }
+
+    // Blinking effect for invincibility
+    if (this.isInvincible) {
+        if (Math.floor(this.invincibleTimer * 10) % 2 === 0) {
+            return; // Skip drawing every other frame to blink
+        }
+    }
+
     // Draw shield
     if (this.isShielded) {
-        ctx.fillStyle = "rgba(0, 150, 255, 0.3)";
+        ctx.strokeStyle = "rgba(0, 150, 255, 0.8)";
+        ctx.lineWidth = 3;
         ctx.beginPath();
         const shieldRadius = (Ship.RADIUS + 5) * BHGame.config.scale;
         ctx.arc(this.pos[0], this.pos[1], shieldRadius, 0, 2 * Math.PI, false);
-        ctx.fill();
+        ctx.stroke();
     }
 
     // Draw ship
@@ -47,38 +70,47 @@
   };
 
   Ship.prototype.collideWith = function(otherObject) {
+    if (this.isDying || this.isInvincible || this.isShielded) {
+        return;
+    }
+
     if (otherObject instanceof BHGame.Item) {
         this.activatePowerUp(otherObject.type);
         this.game.remove(otherObject);
         return;
     }
 
-    if (this.isShielded) {
-        return;
-    }
-
     if (otherObject instanceof BHGame.EnemyObject || otherObject instanceof BHGame.EnemyBullet) {
-      this.game.deaths += 1;
-      if (this.game.deaths >= 3) {
-        this.game.gameOver = true;
-      }
       this.game.remove(otherObject);
-      this.relocate();
+      this.die();
     }
   };
+
+  Ship.prototype.die = function() {
+      this.game.lives--;
+      if (this.game.lives <= 0) {
+          this.game.gameOver = true;
+      }
+      this.isDying = true;
+      this.deathTimer = 0.5; // death animation duration
+      this.vel = [0, 0];
+  }
 
   Ship.prototype.activatePowerUp = function(type) {
       this.game.displayPowerUpMessage(type);
       switch(type) {
           case 'missile':
-              this.missileLevel = Math.min(this.missileLevel + 1, 5); // Cap at 5 missiles
+              this.missileLevel = Math.min(this.missileLevel + 1, 5);
               break;
           case 'life':
-              this.game.deaths = Math.max(this.game.deaths - 1, 0); // Don't go below 0 deaths
+              this.game.lives = Math.min(this.game.lives + 1, 100);
               break;
           case 'shield':
               this.isShielded = true;
-              this.shieldTimer = 5; // 5 seconds of shield
+              this.shieldTimer = 5;
+              break;
+          case 'fireRate':
+              this.fireCooldown = Math.max(this.fireCooldown * 0.8, 0.05); // 20% faster, cap at 0.05s
               break;
       }
   }
@@ -86,15 +118,18 @@
   Ship.prototype.relocate = function() {
     this.pos = [BHGame.Game.DIM_X / 2, BHGame.Game.DIM_Y - 50];
     this.vel = [0, 0];
+    this.isInvincible = true;
+    this.invincibleTimer = 1.5; // Respawn invincibility
   };
 
   Ship.prototype.power = function(impulse) {
+    if (this.isDying) return;
     this.vel[0] += impulse[0] * 0.3;
     this.vel[1] += impulse[1] * 0.3;
   };
 
   Ship.prototype.fireBullet = function() {
-    const spreadAngle = 15; // degrees
+    const spreadAngle = 15;
     const totalAngle = (this.missileLevel - 1) * spreadAngle;
     const startAngle = -totalAngle / 2;
 
@@ -108,6 +143,26 @@
   };
 
   Ship.prototype.move = function(delta) {
+    // Handle death animation
+    if (this.isDying) {
+        this.deathTimer -= delta;
+        if (this.deathTimer <= 0) {
+            this.isDying = false;
+            if (!this.game.gameOver) {
+                this.relocate();
+            }
+        }
+        return; // Don't move/shoot while dying
+    }
+
+    // Handle invincibility timer
+    if (this.isInvincible) {
+        this.invincibleTimer -= delta;
+        if (this.invincibleTimer <= 0) {
+            this.isInvincible = false;
+        }
+    }
+
     // Shield timer
     if (this.isShielded) {
         this.shieldTimer -= delta;
