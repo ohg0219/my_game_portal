@@ -8,7 +8,8 @@ let gameStats = {
         snake: 0,
         memory: 0,
         '2048': 0,
-        sudoku: 0
+        sudoku: 0,
+        chess: 0
     }
 };
 
@@ -58,7 +59,8 @@ function getGameDisplayName(gameName) {
         'snake': '스네이크',
         'memory': '메모리',
         '2048': '2048',
-        'sudoku': '스도쿠'
+        'sudoku': '스도쿠',
+        'chess': '체스'
     };
     return names[gameName] || gameName;
 }
@@ -90,6 +92,8 @@ function addClickEffects() {
                     incrementGamePlay('2048');
                 } else if (href.includes('sudoku')) {
                     incrementGamePlay('sudoku');
+                } else if (href.includes('chess')) {
+                    incrementGamePlay('chess');
                 }
             }
         });
@@ -136,7 +140,7 @@ function addKeyboardShortcuts() {
                 gameStats = {
                     totalPlays: 0,
                     favoriteGame: '-',
-                    gamePlayCounts: { snake: 0, memory: 0, '2048': 0, sudoku: 0 }
+                    gamePlayCounts: { snake: 0, memory: 0, '2048': 0, sudoku: 0, chess: 0 }
                 };
                 updateStatsDisplay();
                 alert('통계가 초기화되었습니다.');
@@ -144,12 +148,13 @@ function addKeyboardShortcuts() {
         }
         
         // 숫자 키로 게임 바로 이동
-        if (e.key >= '1' && e.key <= '4') {
+        if (e.key >= '1' && e.key <= '5') {
             const gameLinks = [
                 'games/snake/index.html',
                 'games/memory/index.html',
                 'games/2048/index.html',
-                'games/sudoku/index.html'
+                'games/sudoku/index.html',
+                'games/chess/index.html'
             ];
             const index = parseInt(e.key) - 1;
             if (gameLinks[index]) {
@@ -192,7 +197,7 @@ function initGamePortal() {
     if (gameStats.totalPlays === 0) {
         setTimeout(() => {
             console.log('🎮 게임 포털에 오신 것을 환영합니다!');
-            console.log('💡 팁: 숫자 키 1, 2, 3으로 게임에 바로 이동할 수 있습니다.');
+            console.log('💡 팁: 숫자 키 1~5로 게임에 바로 이동할 수 있습니다.');
             console.log('🔄 Ctrl+Shift+R로 통계를 초기화할 수 있습니다.');
         }, 1000);
     }
