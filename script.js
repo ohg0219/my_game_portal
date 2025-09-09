@@ -7,7 +7,8 @@ let gameStats = {
     gamePlayCounts: {
         snake: 0,
         memory: 0,
-        '2048': 0
+        '2048': 0,
+        sudoku: 0
     }
 };
 
@@ -56,7 +57,8 @@ function getGameDisplayName(gameName) {
     const names = {
         'snake': '스네이크',
         'memory': '메모리',
-        '2048': '2048'
+        '2048': '2048',
+        'sudoku': '스도쿠'
     };
     return names[gameName] || gameName;
 }
@@ -86,6 +88,8 @@ function addClickEffects() {
                     incrementGamePlay('memory');
                 } else if (href.includes('2048')) {
                     incrementGamePlay('2048');
+                } else if (href.includes('sudoku')) {
+                    incrementGamePlay('sudoku');
                 }
             }
         });
@@ -132,7 +136,7 @@ function addKeyboardShortcuts() {
                 gameStats = {
                     totalPlays: 0,
                     favoriteGame: '-',
-                    gamePlayCounts: { snake: 0, memory: 0, '2048': 0 }
+                    gamePlayCounts: { snake: 0, memory: 0, '2048': 0, sudoku: 0 }
                 };
                 updateStatsDisplay();
                 alert('통계가 초기화되었습니다.');
@@ -140,11 +144,12 @@ function addKeyboardShortcuts() {
         }
         
         // 숫자 키로 게임 바로 이동
-        if (e.key >= '1' && e.key <= '3') {
+        if (e.key >= '1' && e.key <= '4') {
             const gameLinks = [
-                'games/snake/snake_game.html',
+                'games/snake/index.html',
                 'games/memory/index.html',
-                'games/2048/index.html'
+                'games/2048/index.html',
+                'games/sudoku/index.html'
             ];
             const index = parseInt(e.key) - 1;
             if (gameLinks[index]) {
