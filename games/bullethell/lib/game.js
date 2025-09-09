@@ -5,8 +5,10 @@
     this.enemies = [];
     this.bullets = [];
     this.eBullets = [];
+    this.items = [];
 
     this.score = 0;
+    this.nextItemScore = 500;
     this.deaths = 0;
     this.stage = 1;
 
@@ -15,6 +17,9 @@
     this.bossSpawned = false;
     this.stageClear = false;
     this.stageClearTimer = 0;
+
+    this.powerUpMessage = "";
+    this.powerUpMessageTimer = 0;
 
     this.ship = new BHGame.Ship([Game.DIM_X / 2, Game.DIM_Y - 50], this);
 
@@ -33,11 +38,13 @@
       this.bullets.push(object);
     } else if (object instanceof BHGame.EnemyBullet) {
       this.eBullets.push(object);
+    } else if (object instanceof BHGame.Item) {
+      this.items.push(object);
     }
   };
 
   Game.prototype.allObjects = function () {
-    return [].concat(this.ship, this.enemies, this.bullets, this.eBullets);
+    return [].concat(this.ship, this.enemies, this.bullets, this.eBullets, this.items);
   };
 
   Game.prototype.checkCollisions = function () {
@@ -95,6 +102,13 @@
             ctx.fillText(`BOSS HP: ${boss.health}`, Game.DIM_X / 2, 20);
         }
     }
+
+    if (this.powerUpMessageTimer > 0) {
+        ctx.font = "24px Arial";
+        ctx.fillStyle = "yellow";
+        ctx.textAlign = "center";
+        ctx.fillText(this.powerUpMessage, Game.DIM_X / 2, Game.DIM_Y - 20);
+    }
   };
 
   Game.prototype.isOutOfBounds = function (pos) {
@@ -117,6 +131,8 @@
       this.enemies.splice(this.enemies.indexOf(object), 1);
     } else if (object instanceof BHGame.EnemyBullet) {
       this.eBullets.splice(this.eBullets.indexOf(object), 1);
+    } else if (object instanceof BHGame.Item) {
+      this.items.splice(this.items.indexOf(object), 1);
     }
   };
 
@@ -126,6 +142,10 @@
   };
 
   Game.prototype.update = function(delta) {
+    if (this.powerUpMessageTimer > 0) {
+        this.powerUpMessageTimer -= delta;
+    }
+
     if (this.stageClear) {
         this.stageClearTimer -= delta;
         if (this.stageClearTimer <= 0) {
@@ -151,7 +171,29 @@
         }
     }
 
+    if (this.score >= this.nextItemScore) {
+        this.spawnItem();
+        this.nextItemScore += 500;
+    }
+
     this.step(delta);
+  }
+
+  Game.prototype.displayPowerUpMessage = function(type) {
+      const messages = {
+          missile: "Missile Upgrade!",
+          life: "+1 Life!",
+          shield: "Shield On!"
+      }
+      this.powerUpMessage = messages[type] || "Power Up!";
+      this.powerUpMessageTimer = 2; // 2 seconds
+  }
+
+  Game.prototype.spawnItem = function() {
+    const randomX = Math.random() * (Game.DIM_X - 50) + 25;
+    const pos = [randomX, -30];
+    const item = new BHGame.Item(pos, this);
+    this.add(item);
   }
 
   Game.prototype.spawnEnemy = function() {
