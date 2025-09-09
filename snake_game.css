@@ -58,6 +58,7 @@ h1 {
     display: flex;
     flex-direction: column;
     gap: 5px;
+    position: relative;
 }
 
 .difficulty-btn:hover {
@@ -76,6 +77,22 @@ h1 {
     opacity: 0.8;
 }
 
+.high-score-display {
+    font-size: 0.8rem !important;
+    color: #FFD700 !important;
+    margin-top: 5px !important;
+    font-weight: bold;
+}
+
+.tip {
+    margin-top: 20px;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    font-size: 0.8rem;
+    opacity: 0.8;
+}
+
 /* 게임 화면 */
 .game-info {
     display: flex;
@@ -86,9 +103,21 @@ h1 {
     gap: 10px;
 }
 
-.score, .difficulty {
+.score-info {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    text-align: left;
+}
+
+.score, .difficulty, .high-score {
     font-size: 1.2rem;
     font-weight: bold;
+}
+
+.high-score {
+    color: #FFD700;
+    font-size: 1rem;
 }
 
 #gameCanvas {
@@ -172,6 +201,19 @@ h1 {
     margin-top: 20px;
 }
 
+/* 새 기록 축하 메시지 */
+#newRecord {
+    animation: celebration 1s ease-in-out;
+    font-weight: bold;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+@keyframes celebration {
+    0% { transform: scale(0.8); opacity: 0; }
+    50% { transform: scale(1.1); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
 /* 반응형 디자인 */
 @media (max-width: 480px) {
     .container {
@@ -195,6 +237,12 @@ h1 {
         font-size: 1rem;
         justify-content: center;
         text-align: center;
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .score-info {
+        text-align: center;
     }
     
     .game-over-buttons {
@@ -205,5 +253,9 @@ h1 {
     .control-btn {
         width: 100%;
         max-width: 200px;
+    }
+    
+    .tip {
+        font-size: 0.7rem;
     }
 }
