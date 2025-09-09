@@ -61,6 +61,7 @@ body {
     cursor: pointer;
     position: relative;
     overflow: hidden;
+    touch-action: manipulation;
 }
 
 .game-card:hover {
@@ -115,6 +116,7 @@ body {
     transition: all 0.3s ease;
     text-decoration: none;
     display: inline-block;
+    touch-action: manipulation;
 }
 
 .play-button:hover {

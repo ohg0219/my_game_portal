@@ -123,6 +123,7 @@ body {
     transition: all 0.3s ease;
     min-width: 120px;
     text-align: center;
+    touch-action: manipulation;
 }
 
 .difficulty-btn:hover {
@@ -245,6 +246,7 @@ body {
     font-weight: bold;
     cursor: pointer;
     transition: all 0.3s ease;
+    touch-action: manipulation;
 }
 
 .control-btn:hover {
@@ -323,6 +325,7 @@ body {
     font-weight: bold;
     cursor: pointer;
     transition: all 0.3s ease;
+    touch-action: manipulation;
 }
 
 .modal-btn:hover {

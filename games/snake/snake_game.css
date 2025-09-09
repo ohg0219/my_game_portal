@@ -83,6 +83,7 @@ h1 {
     flex-direction: column;
     gap: 5px;
     position: relative;
+    touch-action: manipulation;
 }
 
 .difficulty-btn:hover {
@@ -186,6 +187,7 @@ h1 {
     cursor: pointer;
     transition: all 0.3s ease;
     user-select: none;
+    touch-action: manipulation;
 }
 
 .arrow-key:hover {
@@ -207,6 +209,7 @@ h1 {
     font-weight: bold;
     cursor: pointer;
     transition: all 0.3s ease;
+    touch-action: manipulation;
 }
 
 .control-btn:hover {
