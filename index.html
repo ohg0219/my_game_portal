@@ -31,12 +31,18 @@
                     <span class="level-desc">극한의 속도!</span>
                 </button>
             </div>
+            <div class="tip">
+                <p>💡 팁: Ctrl+Shift+R로 최고 점수를 초기화할 수 있습니다</p>
+            </div>
         </div>
 
         <!-- 게임 화면 -->
         <div id="gameScreen" class="screen hidden">
             <div class="game-info">
-                <div class="score">점수: <span id="score">0</span></div>
+                <div class="score-info">
+                    <div class="score">점수: <span id="score">0</span></div>
+                    <div class="high-score">최고: <span id="highScore">0</span></div>
+                </div>
                 <div class="difficulty">난이도: <span id="currentDifficulty"></span></div>
                 <button id="pauseBtn" class="control-btn">일시정지</button>
             </div>
@@ -61,9 +67,11 @@
         <!-- 게임 오버 화면 -->
         <div id="gameOverScreen" class="screen hidden">
             <h2>게임 오버!</h2>
+            <div id="newRecord" style="display: none; color: #FFD700; font-size: 1.1rem; margin: 10px 0;"></div>
             <div class="final-score">
                 <p>최종 점수: <span id="finalScore">0</span></p>
                 <p>난이도: <span id="finalDifficulty"></span></p>
+                <p>최고 점수: <span id="finalHighScore">0</span></p>
             </div>
             <div class="game-over-buttons">
                 <button id="restartBtn" class="control-btn">다시 시작</button>
