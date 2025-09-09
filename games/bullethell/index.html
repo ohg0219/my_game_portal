@@ -69,17 +69,23 @@
 
         function setupCanvas() {
             const containerWidth = gameContainer.offsetWidth;
+            const isMobile = window.innerWidth < 768;
+
             canvas.width = Math.min(containerWidth, 800);
-            canvas.height = canvas.width * 0.75;
+
+            if (isMobile) {
+                // Taller aspect ratio for mobile
+                canvas.height = window.innerHeight * 0.7;
+            } else {
+                // Wider aspect ratio for desktop
+                canvas.height = canvas.width * 0.75;
+            }
+
             BHGame.Game.DIM_X = canvas.width;
             BHGame.Game.DIM_Y = canvas.height;
 
             // Set scale factor for responsive sizing
-            if (window.innerWidth < 768) {
-                BHGame.config.scale = 0.7;
-            } else {
-                BHGame.config.scale = 1.0;
-            }
+            BHGame.config.scale = isMobile ? 0.7 : 1.0;
             BHGame.config.baseSpeed = 1.0;
         }
 

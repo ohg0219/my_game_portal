@@ -1,7 +1,13 @@
 (function () {
   window.BHGame = window.BHGame || {};
 
-  const ITEM_TYPES = ['missile', 'shield', 'life'];
+  // Weighted list for item drops
+  const ITEM_TYPES = [
+      'missile', 'missile', 'missile',
+      'fireRate', 'fireRate', 'fireRate',
+      'shield', 'shield',
+      'life'
+    ];
 
   var Item = window.BHGame.Item = function (pos, game) {
     this.type = ITEM_TYPES[Math.floor(Math.random() * ITEM_TYPES.length)];
