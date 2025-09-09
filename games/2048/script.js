@@ -80,6 +80,7 @@ class Game2048 {
     setupLayout() {
         const settings = this.getGameSettings();
         const gameContainer = document.querySelector('.game-container');
+        const gridContainer = document.querySelector('.grid-container');
         const gridRows = document.querySelectorAll('.grid-row');
         const gridCells = document.querySelectorAll('.grid-cell');
         const tileContainer = document.querySelector('.tile-container');
@@ -89,12 +90,19 @@ class Game2048 {
         gameContainer.style.height = settings.totalSize + 'px';
         gameContainer.style.padding = settings.containerPadding + 'px';
         
+        // 그리드 컨테이너 크기 설정
+        const gridSize = settings.totalSize - (settings.containerPadding * 2);
+        gridContainer.style.width = gridSize + 'px';
+        gridContainer.style.height = gridSize + 'px';
+        
         // 그리드 셀 크기 및 간격 설정
         gridRows.forEach((row, rowIndex) => {
             row.style.gap = settings.gap + 'px';
             if (rowIndex < gridRows.length - 1) {
                 row.style.marginBottom = settings.gap + 'px';
             }
+            // 그리드 로우 크기 설정
+            row.style.height = settings.tileSize + 'px';
         });
         
         gridCells.forEach(cell => {
@@ -102,11 +110,11 @@ class Game2048 {
             cell.style.height = settings.tileSize + 'px';
         });
         
-        // 타일 컨테이너 위치 설정
+        // 타일 컨테이너 위치 설정 (그리드 컨테이너와 동일한 크기)
         tileContainer.style.top = settings.containerPadding + 'px';
         tileContainer.style.left = settings.containerPadding + 'px';
-        tileContainer.style.width = (settings.totalSize - settings.containerPadding * 2) + 'px';
-        tileContainer.style.height = (settings.totalSize - settings.containerPadding * 2) + 'px';
+        tileContainer.style.width = gridSize + 'px';
+        tileContainer.style.height = gridSize + 'px';
     }
     
     getTileFontSize(value) {
