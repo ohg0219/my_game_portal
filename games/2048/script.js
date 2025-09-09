@@ -164,49 +164,7 @@ class Game2048 {
             }
         });
         
-        // 터치 이벤트
-        let startX, startY;
-        const gameContainer = document.querySelector('.game-container');
-        
-        gameContainer.addEventListener('touchstart', (e) => {
-            startX = e.touches[0].clientX;
-            startY = e.touches[0].clientY;
-        });
-        
-        gameContainer.addEventListener('touchend', (e) => {
-            if (!startX || !startY) return;
-            
-            const endX = e.changedTouches[0].clientX;
-            const endY = e.changedTouches[0].clientY;
-            
-            const diffX = startX - endX;
-            const diffY = startY - endY;
-            
-            const minSwipeDistance = 50;
-            
-            if (Math.abs(diffX) > Math.abs(diffY)) {
-                if (Math.abs(diffX) > minSwipeDistance) {
-                    if (diffX > 0) {
-                        this.move('left');
-                    } else {
-                        this.move('right');
-                    }
-                }
-            } else {
-                if (Math.abs(diffY) > minSwipeDistance) {
-                    if (diffY > 0) {
-                        this.move('up');
-                    } else {
-                        this.move('down');
-                    }
-                }
-            }
-            
-            startX = null;
-            startY = null;
-        });
-        
-        // 모바일 컨트롤 버튼
+        // 모바일 컨트롤 버튼만 사용
         document.querySelectorAll('.control-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 const direction = btn.getAttribute('data-direction');
