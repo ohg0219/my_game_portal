@@ -84,8 +84,13 @@ h1 {
     cursor: default;
 }
 
-.piece.white {
+.piece.piece-white {
     cursor: pointer;
+    /* The color is inherited from the body (white) */
+}
+
+.piece.piece-black {
+    color: #333;
 }
 
 .selected {
