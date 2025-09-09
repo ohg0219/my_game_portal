@@ -40,7 +40,8 @@
         this.game.ship.pos[1] - this.pos[1],
         this.game.ship.pos[0] - this.pos[0]
     );
-    const vel = [Math.cos(angle) * 2, Math.sin(angle) * 2];
+    const speed = 2 * BHGame.config.enemySpeedMultiplier;
+    const vel = [Math.cos(angle) * speed, Math.sin(angle) * speed];
     const bullet = new BHGame.EnemyBullet(this.pos.slice(), vel, this.game);
     this.game.add(bullet);
   };

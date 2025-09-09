@@ -2,7 +2,8 @@
   window.BHGame = window.BHGame || {};
 
   var EnemySatellite = window.BHGame.EnemySatellite = function (pos, game) {
-    var vel = [0, 0.5 * BHGame.config.baseSpeed];
+    var speed = 0.5 * BHGame.config.baseSpeed * BHGame.config.enemySpeedMultiplier;
+    var vel = [0, speed];
     BHGame.EnemyObject.call(
       this,
       pos,
