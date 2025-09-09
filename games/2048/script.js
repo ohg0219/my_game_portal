@@ -16,6 +16,7 @@ class Game2048 {
     
     init() {
         this.setupBoard();
+        this.setupLayout();
         this.setupEventListeners();
         this.updateDisplay();
         this.addRandomTile();
@@ -30,6 +31,95 @@ class Game2048 {
             for (let j = 0; j < this.size; j++) {
                 this.board[i][j] = 0;
             }
+        }
+    }
+    
+    getGameSettings() {
+        // 화면 크기에 따른 게임 설정 계산
+        const screenWidth = window.innerWidth;
+        const screenHeight = window.innerHeight;
+        const isPortrait = screenHeight > screenWidth;
+        const containerPadding = 15;
+        
+        let tileSize, gap, fontSize;
+        
+        if (isPortrait && screenWidth <= 500) {
+            // 세로 모드 - 작은 화면
+            tileSize = 65;
+            gap = 8;
+            fontSize = { normal: 32, medium: 28, small: 22, tiny: 18 };
+        } else if (screenWidth <= 480) {
+            // 가로 모드 - 작은 화면
+            tileSize = 70;
+            gap = 10;
+            fontSize = { normal: 36, medium: 30, small: 24, tiny: 20 };
+        } else if (screenWidth <= 600) {
+            // 중간 화면
+            tileSize = 80;
+            gap = 12;
+            fontSize = { normal: 42, medium: 36, small: 28, tiny: 22 };
+        } else {
+            // 큰 화면 (데스크톱)
+            tileSize = 100;
+            gap = 15;
+            fontSize = { normal: 55, medium: 45, small: 35, tiny: 30 };
+        }
+        
+        // 컨테이너 크기 계산
+        const totalSize = (tileSize * 4) + (gap * 3) + (containerPadding * 2);
+        
+        return {
+            tileSize,
+            gap,
+            fontSize,
+            containerPadding,
+            totalSize
+        };
+    }
+    
+    setupLayout() {
+        const settings = this.getGameSettings();
+        const gameContainer = document.querySelector('.game-container');
+        const gridRows = document.querySelectorAll('.grid-row');
+        const gridCells = document.querySelectorAll('.grid-cell');
+        const tileContainer = document.querySelector('.tile-container');
+        
+        // 게임 컨테이너 크기 설정
+        gameContainer.style.width = settings.totalSize + 'px';
+        gameContainer.style.height = settings.totalSize + 'px';
+        gameContainer.style.padding = settings.containerPadding + 'px';
+        
+        // 그리드 셀 크기 및 간격 설정
+        gridRows.forEach((row, rowIndex) => {
+            row.style.gap = settings.gap + 'px';
+            if (rowIndex < gridRows.length - 1) {
+                row.style.marginBottom = settings.gap + 'px';
+            }
+        });
+        
+        gridCells.forEach(cell => {
+            cell.style.width = settings.tileSize + 'px';
+            cell.style.height = settings.tileSize + 'px';
+        });
+        
+        // 타일 컨테이너 위치 설정
+        tileContainer.style.top = settings.containerPadding + 'px';
+        tileContainer.style.left = settings.containerPadding + 'px';
+        tileContainer.style.width = (settings.totalSize - settings.containerPadding * 2) + 'px';
+        tileContainer.style.height = (settings.totalSize - settings.containerPadding * 2) + 'px';
+    }
+    
+    getTileFontSize(value) {
+        const { fontSize } = this.getGameSettings();
+        
+        if (value >= 1024) {
+            return fontSize.tiny;
+        } else if (value >= 128) {
+            return fontSize.small;
+        } else if (value >= 16) {
+            return fontSize.medium;
+        } else {
+            return fontSize.normal;
         }
     }
     
@@ -116,17 +206,22 @@ class Game2048 {
             });
         });
         
-        // 윈도우 리사이즈 및 방향 변경 이벤트
+        // 윈도우 리사이즈 이벤트
+        let resizeTimeout;
         window.addEventListener('resize', () => {
-            setTimeout(() => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                this.setupLayout();
                 this.renderBoard();
-            }, 100);
+            }, 200);
         });
         
+        // 방향 변경 이벤트
         window.addEventListener('orientationchange', () => {
             setTimeout(() => {
+                this.setupLayout();
                 this.renderBoard();
-            }, 300);
+            }, 500);
         });
         
         // 게임 컨트롤 버튼
@@ -199,7 +294,7 @@ class Game2048 {
         }
         
         if (moved) {
-            // 즉시 새 보드 렌더링 (애니메이션 포함)
+            // 즉시 새 보드 렌더링
             this.renderBoard();
             
             // 새 타일 추가는 약간 지연
@@ -214,16 +309,16 @@ class Game2048 {
                     this.gameWon = true;
                     setTimeout(() => {
                         this.showVictory();
-                    }, 200);
+                    }, 300);
                 }
                 
                 if (this.checkGameOver()) {
                     this.gameOver = true;
                     setTimeout(() => {
                         this.showGameOver();
-                    }, 200);
+                    }, 300);
                 }
-            }, 200);
+            }, 150);
         } else {
             // 움직이지 않았으면 이전 상태 제거
             this.previousStates.pop();
@@ -364,109 +459,37 @@ class Game2048 {
         return moved;
     }
     
-    getTileSize() {
-        // 화면 크기와 방향에 따른 타일 크기 계산
-        const screenWidth = window.innerWidth;
-        const screenHeight = window.innerHeight;
-        const isPortrait = screenHeight > screenWidth;
-        
-        // 세로 모드에서는 더 작은 타일 사용
-        if (isPortrait && screenWidth <= 500) {
-            return { size: 60, gap: 8, fontSize: {
-                normal: 30,
-                medium: 26,
-                small: 20,
-                tiny: 16
-            }};
-        } else if (screenWidth <= 480) {
-            return { size: 70, gap: 10, fontSize: {
-                normal: 35,
-                medium: 30,
-                small: 24,
-                tiny: 20
-            }};
-        } else if (screenWidth <= 600) {
-            return { size: 80, gap: 10, fontSize: {
-                normal: 45,
-                medium: 35,
-                small: 28,
-                tiny: 24
-            }};
-        } else {
-            return { size: 100, gap: 15, fontSize: {
-                normal: 55,
-                medium: 45,
-                small: 35,
-                tiny: 30
-            }};
-        }
-    }
-    
-    getTileFontSize(value) {
-        const { fontSize } = this.getTileSize();
-        
-        if (value >= 1024) {
-            return fontSize.tiny;
-        } else if (value >= 128) {
-            return fontSize.small;
-        } else if (value >= 16) {
-            return fontSize.medium;
-        } else {
-            return fontSize.normal;
-        }
-    }
-    
     renderBoard() {
         const container = document.getElementById('tile-container');
-        const { size: tileSize, gap } = this.getTileSize();
+        const settings = this.getGameSettings();
         
-        // 기존 타일들 제거 (애니메이션과 함께)
-        const existingTiles = Array.from(container.children);
-        existingTiles.forEach(tile => {
-            tile.style.transition = 'all 0.15s ease-in-out';
-            tile.style.opacity = '0';
-            tile.style.transform += ' scale(0.9)';
-        });
+        // 기존 타일들 제거
+        container.innerHTML = '';
         
-        // 새 타일들 생성
-        setTimeout(() => {
-            container.innerHTML = '';
-            
-            for (let i = 0; i < this.size; i++) {
-                for (let j = 0; j < this.size; j++) {
-                    if (this.board[i][j] !== 0) {
-                        const tile = document.createElement('div');
-                        tile.className = `tile tile-${this.board[i][j]}`;
-                        tile.textContent = this.board[i][j];
-                        tile.setAttribute('data-row', i);
-                        tile.setAttribute('data-col', j);
-                        tile.setAttribute('data-value', this.board[i][j]);
-                        
-                        // 반응형 위치 계산
-                        const x = j * (tileSize + gap);
-                        const y = i * (tileSize + gap);
-                        
-                        // 타일 크기 및 폰트 크기 설정
-                        tile.style.width = tileSize + 'px';
-                        tile.style.height = tileSize + 'px';
-                        tile.style.fontSize = this.getTileFontSize(this.board[i][j]) + 'px';
-                        
-                        // 시작은 약간 작게, 투명하게
-                        tile.style.transform = `translate(${x}px, ${y}px) scale(0.9)`;
-                        tile.style.opacity = '0';
-                        
-                        container.appendChild(tile);
-                        
-                        // 애니메이션으로 나타나기
-                        setTimeout(() => {
-                            tile.style.transition = 'all 0.15s ease-in-out';
-                            tile.style.transform = `translate(${x}px, ${y}px) scale(1)`;
-                            tile.style.opacity = '1';
-                        }, 10);
-                    }
+        for (let i = 0; i < this.size; i++) {
+            for (let j = 0; j < this.size; j++) {
+                if (this.board[i][j] !== 0) {
+                    const tile = document.createElement('div');
+                    tile.className = `tile tile-${this.board[i][j]}`;
+                    tile.textContent = this.board[i][j];
+                    tile.setAttribute('data-row', i);
+                    tile.setAttribute('data-col', j);
+                    tile.setAttribute('data-value', this.board[i][j]);
+                    
+                    // 정확한 위치 계산
+                    const x = j * (settings.tileSize + settings.gap);
+                    const y = i * (settings.tileSize + settings.gap);
+                    
+                    // 타일 스타일 설정
+                    tile.style.width = settings.tileSize + 'px';
+                    tile.style.height = settings.tileSize + 'px';
+                    tile.style.fontSize = this.getTileFontSize(this.board[i][j]) + 'px';
+                    tile.style.transform = `translate(${x}px, ${y}px)`;
+                    
+                    container.appendChild(tile);
                 }
             }
-        }, 100);
+        }
     }
     
     updateDisplay() {
@@ -615,6 +638,7 @@ class Game2048 {
         document.getElementById('undo-btn').disabled = true;
         
         this.setupBoard();
+        this.setupLayout();
         this.addRandomTile();
         this.addRandomTile();
         this.renderBoard();

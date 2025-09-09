@@ -136,24 +136,13 @@ body {
     background: #f67c5f;
 }
 
-/* 게임 보드 */
+/* 게임 보드 - 기본값 */
 .game-container {
     position: relative;
     background: #bbada0;
     border-radius: 10px;
-    padding: 15px;
-    margin-bottom: 20px;
-    width: 100%;
-    max-width: 500px;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-/* 세로 모드에서는 더 작은 최대 너비 */
-@media (max-width: 500px) and (orientation: portrait) {
-    .game-container {
-        max-width: 300px;
-    }
+    margin: 0 auto 20px auto;
+    box-sizing: border-box;
 }
 
 .grid-container {
@@ -163,17 +152,9 @@ body {
 
 .grid-row {
     display: flex;
-    gap: 15px;
-    margin-bottom: 15px;
-}
-
-.grid-row:last-child {
-    margin-bottom: 0;
 }
 
 .grid-cell {
-    width: 100px;
-    height: 100px;
     background: rgba(238, 228, 218, 0.35);
     border-radius: 6px;
     flex: 0 0 auto;
@@ -181,10 +162,10 @@ body {
 
 .tile-container {
     position: absolute;
-    top: 15px;
-    left: 15px;
-    width: calc(100% - 30px);
-    height: calc(100% - 30px);
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     z-index: 2;
 }
 
@@ -387,10 +368,6 @@ body {
 
 /* 반응형 디자인 */
 @media (max-width: 768px) {
-    .container {
-        padding: 10px;
-    }
-    
     .header h1 {
         font-size: 3rem;
     }
@@ -407,131 +384,28 @@ body {
     .mobile-controls {
         display: flex;
     }
-    
-    .instructions .mobile-instructions {
-        display: block;
-    }
 }
 
-/* 세로 모드 (포트레이트) */
-@media (max-width: 500px) and (orientation: portrait) {
-    .container {
-        padding: 5px;
-    }
-    
+@media (max-width: 600px) {
     .header h1 {
-        font-size: 2rem;
-        margin-bottom: 5px;
+        font-size: 2.5rem;
     }
     
-    .subtitle {
-        font-size: 0.9rem;
-        margin-bottom: 15px;
-    }
-    
-    .game-container {
-        padding: 8px;
-        margin-bottom: 15px;
-    }
-    
-    .grid-row {
-        gap: 8px;
-        margin-bottom: 8px;
-    }
-    
-    .grid-cell {
-        width: 60px;
-        height: 60px;
-    }
-    
-    .tile-container {
-        top: 8px;
-        left: 8px;
-        width: calc(100% - 16px);
-        height: calc(100% - 16px);
-    }
-    
-    .score-box {
-        padding: 8px 15px;
-        min-width: 60px;
-    }
-    
-    .score-label {
-        font-size: 11px;
-    }
-    
-    .score-value {
-        font-size: 20px;
-    }
-    
-    .btn {
-        padding: 8px 15px;
-        font-size: 12px;
-    }
-    
-    .mobile-controls {
-        margin-top: 10px;
-    }
-    
-    .control-btn {
+    .mobile-controls .control-btn {
         width: 50px;
         height: 50px;
         font-size: 20px;
     }
 }
 
-@media (max-width: 600px) {
-    .game-container {
-        padding: 10px;
-    }
-    
-    .grid-row {
-        gap: 10px;
-        margin-bottom: 10px;
-    }
-    
-    .grid-cell {
-        width: 80px;
-        height: 80px;
-    }
-    
-    .tile-container {
-        top: 10px;
-        left: 10px;
-        width: calc(100% - 20px);
-        height: calc(100% - 20px);
-    }
-}
-
 @media (max-width: 480px) {
     .header h1 {
-        font-size: 2.5rem;
+        font-size: 2rem;
     }
     
     .back-button {
         position: relative;
         margin-bottom: 15px;
-    }
-    
-    .game-container {
-        padding: 10px;
-    }
-    
-    .grid-row {
-        gap: 10px;
-        margin-bottom: 10px;
-    }
-    
-    .grid-cell {
-        width: 70px;
-        height: 70px;
-    }
-    
-    .tile-container {
-        top: 10px;
-        left: 10px;
-        width: calc(100% - 20px);
-        height: calc(100% - 20px);
     }
     
     .game-over-popup,
