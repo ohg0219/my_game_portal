@@ -46,10 +46,14 @@
     <script src="lib/enemyBullet.js"></script>
     <script src="lib/ship.js"></script>
     <script src="lib/enemyObject.js"></script>
-    <script src="lib/enemy1.js"></script>
+    <script src="lib/enemyUFO.js"></script>
+    <script src="lib/enemySatellite.js"></script>
+    <script src="lib/enemyBoss.js"></script>
     <script src="lib/game.js"></script>
     <script src="gameView.js"></script>
     <script>
+      window.BHGame.config = {};
+
       window.onload = function () {
         const canvas = document.getElementById('game-canvas');
         const instructions = document.getElementById('instructions');
@@ -66,6 +70,14 @@
             canvas.height = canvas.width * 0.75;
             BHGame.Game.DIM_X = canvas.width;
             BHGame.Game.DIM_Y = canvas.height;
+
+            // Set scale factor for responsive sizing
+            if (window.innerWidth < 768) {
+                BHGame.config.scale = 0.7;
+            } else {
+                BHGame.config.scale = 1.0;
+            }
+            BHGame.config.baseSpeed = 1.0;
         }
 
         function startGame() {
