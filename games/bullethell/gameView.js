@@ -5,6 +5,7 @@
     this.ctx = ctx;
     this.game = game;
     this.ship = this.game.ship;
+    this.animationFrameId = null;
   });
 
   GameView.MOVES = {
@@ -16,35 +17,42 @@
 
   GameView.prototype.bindKeyHandlers = function() {
     const ship = this.ship;
-    let moveInterval;
+    let moveIntervals = {};
 
-    // Keyboard controls
     const handleKeyDown = (e) => {
-      const move = GameView.MOVES[e.key];
-      if (move) {
-        ship.power(move);
-      }
-      if (e.key === ' ') {
-        ship.fireBullet();
-      }
+        const move = GameView.MOVES[e.key.toLowerCase()];
+        if (move) {
+            if (!moveIntervals[e.key.toLowerCase()]) {
+                moveIntervals[e.key.toLowerCase()] = setInterval(() => ship.power(move), 50);
+            }
+        }
     };
-    document.addEventListener('keydown', handleKeyDown);
 
-    // Mobile controls
+    const handleKeyUp = (e) => {
+        const key = e.key.toLowerCase();
+        if (moveIntervals[key]) {
+            clearInterval(moveIntervals[key]);
+            delete moveIntervals[key];
+        }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('keyup', handleKeyUp);
+
     document.querySelectorAll('.control-btn').forEach(btn => {
         const direction = btn.dataset.direction;
         if (direction) {
             const move = GameView.MOVES[direction];
             const startMove = (e) => {
                 e.preventDefault();
-                if (!moveInterval) {
-                   moveInterval = setInterval(() => ship.power(move), 50);
+                if (!moveIntervals[direction]) {
+                   moveIntervals[direction] = setInterval(() => ship.power(move), 50);
                 }
             }
             const endMove = (e) => {
                 e.preventDefault();
-                clearInterval(moveInterval);
-                moveInterval = null;
+                clearInterval(moveIntervals[direction]);
+                delete moveIntervals[direction];
             }
             btn.addEventListener('mousedown', startMove);
             btn.addEventListener('touchstart', startMove);
@@ -54,14 +62,9 @@
         }
     });
 
-    document.getElementById('fire-btn').addEventListener('click', (e) => {
-        e.preventDefault();
-        ship.fireBullet();
-    });
-
-
     this.removeKeyHandlers = () => {
       document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('keyup', handleKeyUp);
       // a more robust solution would be to remove the mobile listeners too
     }
   };
@@ -69,18 +72,27 @@
   GameView.prototype.start = function() {
     this.bindKeyHandlers();
     this.lastTime = 0;
-    requestAnimationFrame(this.animate.bind(this));
+    this.animationFrameId = requestAnimationFrame(this.animate.bind(this));
   };
+
+  GameView.prototype.stop = function() {
+      if (this.animationFrameId) {
+          cancelAnimationFrame(this.animationFrameId);
+      }
+      this.removeKeyHandlers();
+  }
+
+  GameView.prototype.displayGameOver = function() {
+      const overlay = document.getElementById('game-over-overlay');
+      const finalScore = document.getElementById('final-score');
+      finalScore.innerText = this.game.score;
+      overlay.style.display = 'flex';
+  }
 
   GameView.prototype.animate = function(time) {
     if (this.game.gameOver) {
-      this.removeKeyHandlers();
-      this.ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
-      this.ctx.fillRect(0, 0, BHGame.Game.DIM_X, BHGame.Game.DIM_Y);
-      this.ctx.fillStyle = "white";
-      this.ctx.font = "48px sans-serif";
-      this.ctx.textAlign = "center";
-      this.ctx.fillText("Game Over", BHGame.Game.DIM_X / 2, BHGame.Game.DIM_Y / 2);
+      this.stop();
+      this.displayGameOver();
       return;
     }
 
@@ -89,6 +101,6 @@
     this.game.draw(this.ctx);
     this.lastTime = time;
 
-    requestAnimationFrame(this.animate.bind(this));
+    this.animationFrameId = requestAnimationFrame(this.animate.bind(this));
   };
 })();
