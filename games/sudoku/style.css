@@ -11,6 +11,10 @@ body {
     min-height: 100vh;
     padding: 20px;
     -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
 }
 
 .container {
@@ -109,6 +113,7 @@ body {
     color: white;
     cursor: pointer;
     transition: all 0.3s ease;
+    touch-action: manipulation;
 }
 
 .difficulty-btn:hover, .difficulty-btn.active {
@@ -201,6 +206,7 @@ body {
     background-color: rgba(255, 255, 255, 0.15);
     color: white;
     transition: all 0.2s;
+    touch-action: manipulation;
 }
 .number-btn:hover {
     background-color: rgba(255, 255, 255, 0.3);
@@ -222,6 +228,7 @@ body {
     font-weight: bold;
     cursor: pointer;
     transition: all 0.3s ease;
+    touch-action: manipulation;
 }
 .control-btn:hover {
     transform: translateY(-2px);
@@ -258,6 +265,7 @@ body {
     border: none; border-radius: 25px; padding: 12px 25px;
     color: white; font-size: 1rem; font-weight: bold;
     cursor: pointer; transition: all 0.3s ease;
+    touch-action: manipulation;
 }
 .modal-btn:hover {
     transform: translateY(-2px);
