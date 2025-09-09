@@ -116,11 +116,17 @@ class Game2048 {
             });
         });
         
-        // 윈도우 리사이즈 이벤트
+        // 윈도우 리사이즈 및 방향 변경 이벤트
         window.addEventListener('resize', () => {
             setTimeout(() => {
                 this.renderBoard();
             }, 100);
+        });
+        
+        window.addEventListener('orientationchange', () => {
+            setTimeout(() => {
+                this.renderBoard();
+            }, 300);
         });
         
         // 게임 컨트롤 버튼
@@ -359,10 +365,20 @@ class Game2048 {
     }
     
     getTileSize() {
-        // 화면 크기에 따른 타일 크기 계산
+        // 화면 크기와 방향에 따른 타일 크기 계산
         const screenWidth = window.innerWidth;
+        const screenHeight = window.innerHeight;
+        const isPortrait = screenHeight > screenWidth;
         
-        if (screenWidth <= 480) {
+        // 세로 모드에서는 더 작은 타일 사용
+        if (isPortrait && screenWidth <= 500) {
+            return { size: 60, gap: 8, fontSize: {
+                normal: 30,
+                medium: 26,
+                small: 20,
+                tiny: 16
+            }};
+        } else if (screenWidth <= 480) {
             return { size: 70, gap: 10, fontSize: {
                 normal: 35,
                 medium: 30,
