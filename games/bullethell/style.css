@@ -161,6 +161,10 @@ canvas {
     border-radius: 50%;
     cursor: pointer;
     touch-action: manipulation;
+    user-select: none;
+    -webkit-user-select: none; /* Safari */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* IE10+/Edge */
 }
 .control-btn:active {
     background: rgba(255, 255, 255, 0.4);

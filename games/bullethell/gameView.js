@@ -6,6 +6,7 @@
     this.game = game;
     this.ship = this.game.ship;
     this.animationFrameId = null;
+    this.pressedKeys = new Set();
   });
 
   GameView.MOVES = {
@@ -13,27 +14,27 @@
     a: [-1, 0],
     s: [0, 1],
     d: [1, 0],
+    arrowup: [0, -1],
+    arrowleft: [-1, 0],
+    arrowdown: [0, 1],
+    arrowright: [1, 0],
   };
 
   GameView.prototype.bindKeyHandlers = function() {
-    const ship = this.ship;
-    let moveIntervals = {};
-
     const handleKeyDown = (e) => {
-        const move = GameView.MOVES[e.key.toLowerCase()];
-        if (move) {
-            if (!moveIntervals[e.key.toLowerCase()]) {
-                moveIntervals[e.key.toLowerCase()] = setInterval(() => ship.power(move), 50);
-            }
-        }
+      const key = e.key.toLowerCase();
+      if (GameView.MOVES[key]) {
+        e.preventDefault();
+        this.pressedKeys.add(key);
+      }
     };
 
     const handleKeyUp = (e) => {
-        const key = e.key.toLowerCase();
-        if (moveIntervals[key]) {
-            clearInterval(moveIntervals[key]);
-            delete moveIntervals[key];
-        }
+      const key = e.key.toLowerCase();
+      if (GameView.MOVES[key]) {
+        e.preventDefault();
+        this.pressedKeys.delete(key);
+      }
     };
 
     document.addEventListener('keydown', handleKeyDown);
@@ -41,33 +42,41 @@
 
     document.querySelectorAll('.control-btn').forEach(btn => {
         const direction = btn.dataset.direction;
-        if (direction) {
-            const move = GameView.MOVES[direction];
-            const startMove = (e) => {
-                e.preventDefault();
-                if (!moveIntervals[direction]) {
-                   moveIntervals[direction] = setInterval(() => ship.power(move), 50);
-                }
-            }
-            const endMove = (e) => {
-                e.preventDefault();
-                clearInterval(moveIntervals[direction]);
-                delete moveIntervals[direction];
-            }
-            btn.addEventListener('mousedown', startMove);
-            btn.addEventListener('touchstart', startMove);
-            btn.addEventListener('mouseup', endMove);
-            btn.addEventListener('touchend', endMove);
-            btn.addEventListener('mouseleave', endMove);
+        const startMove = (e) => {
+            e.preventDefault();
+            this.pressedKeys.add(direction);
         }
+        const endMove = (e) => {
+            e.preventDefault();
+            this.pressedKeys.delete(direction);
+        }
+        btn.addEventListener('mousedown', startMove);
+        btn.addEventListener('touchstart', startMove, { passive: false });
+        btn.addEventListener('mouseup', endMove);
+        btn.addEventListener('touchend', endMove);
+        btn.addEventListener('mouseleave', endMove);
     });
 
     this.removeKeyHandlers = () => {
       document.removeEventListener('keydown', handleKeyDown);
       document.removeEventListener('keyup', handleKeyUp);
-      // a more robust solution would be to remove the mobile listeners too
+      // It's okay not to remove mobile listeners as they are specific to this page
     }
   };
+
+  GameView.prototype.applyMovement = function() {
+      let totalImpulse = [0, 0];
+      this.pressedKeys.forEach(key => {
+          const move = GameView.MOVES[key];
+          if (move) {
+              totalImpulse[0] += move[0];
+              totalImpulse[1] += move[1];
+          }
+      });
+      if (totalImpulse[0] !== 0 || totalImpulse[1] !== 0) {
+        this.ship.power(totalImpulse);
+      }
+  }
 
   GameView.prototype.start = function() {
     this.bindKeyHandlers();
@@ -95,6 +104,8 @@
       this.displayGameOver();
       return;
     }
+
+    this.applyMovement();
 
     const timeDelta = time - this.lastTime;
     this.game.update(timeDelta / 1000);

@@ -5,12 +5,16 @@
     this.enemies = [];
     this.bullets = [];
     this.eBullets = [];
-    this.gameTime = 0;
+
     this.score = 0;
     this.deaths = 0;
+    this.stage = 1;
+
     this.gameOver = false;
     this.bossMode = false;
     this.bossSpawned = false;
+    this.stageClear = false;
+    this.stageClearTimer = 0;
 
     this.ship = new BHGame.Ship([Game.DIM_X / 2, Game.DIM_Y - 50], this);
 
@@ -43,7 +47,7 @@
         const obj1 = allObjects[i];
         const obj2 = allObjects[j];
 
-        if (!obj1 || !obj2) continue; // Skip if an object was removed
+        if (!obj1 || !obj2) continue;
 
         if (obj1.isCollidedWith(obj2)) {
           obj1.collideWith(obj2);
@@ -62,6 +66,17 @@
     });
 
     this.renderHUD(ctx);
+
+    if (this.stageClear) {
+        ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+        ctx.fillRect(0, 0, Game.DIM_X, Game.DIM_Y);
+        ctx.fillStyle = "white";
+        ctx.font = "48px sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(`Stage ${this.stage} Clear!`, Game.DIM_X / 2, Game.DIM_Y / 2 - 50);
+        ctx.font = "32px sans-serif";
+        ctx.fillText(`Next stage in ${Math.ceil(this.stageClearTimer)}`, Game.DIM_X / 2, Game.DIM_Y / 2 + 20);
+    }
   };
 
   Game.prototype.renderHUD = function (ctx){
@@ -71,18 +86,19 @@
     ctx.fillText("LIVES: " + (3 - this.deaths), 10, 20);
     ctx.textAlign = "right";
     ctx.fillText("SCORE: " + this.score, Game.DIM_X - 10, 20);
+    ctx.textAlign = "center";
+    ctx.fillText("STAGE: " + this.stage, Game.DIM_X / 2, 40);
 
     if (this.bossMode) {
         const boss = this.enemies.find(e => e instanceof BHGame.EnemyBoss);
         if (boss) {
-            ctx.textAlign = "center";
             ctx.fillText(`BOSS HP: ${boss.health}`, Game.DIM_X / 2, 20);
         }
     }
   };
 
   Game.prototype.isOutOfBounds = function (pos) {
-    return (pos[1] > Game.DIM_Y) || (pos[1] < -50); // Give some buffer for spawning
+    return (pos[1] > Game.DIM_Y) || (pos[1] < -50);
   };
 
   Game.prototype.moveObjects = function (delta) {
@@ -95,6 +111,9 @@
     if (object instanceof BHGame.Bullet) {
       this.bullets.splice(this.bullets.indexOf(object), 1);
     } else if (object instanceof BHGame.EnemyObject) {
+      if (object instanceof BHGame.EnemyBoss && object.health <= 0) {
+          this.startStageClear();
+      }
       this.enemies.splice(this.enemies.indexOf(object), 1);
     } else if (object instanceof BHGame.EnemyBullet) {
       this.eBullets.splice(this.eBullets.indexOf(object), 1);
@@ -107,7 +126,15 @@
   };
 
   Game.prototype.update = function(delta) {
-    if (this.score >= Game.BOSS_SCORE_THRESHOLD && !this.bossMode) {
+    if (this.stageClear) {
+        this.stageClearTimer -= delta;
+        if (this.stageClearTimer <= 0) {
+            this.nextStage();
+        }
+        return; // Pause game logic during countdown
+    }
+
+    if (this.score >= Game.BOSS_SCORE_THRESHOLD * this.stage && !this.bossMode) {
         this.bossMode = true;
     }
 
@@ -142,11 +169,23 @@
   }
 
   Game.prototype.spawnBoss = function() {
-      // Clear existing enemies
       this.enemies = [];
       const pos = [Game.DIM_X / 2, 100];
       const boss = new BHGame.EnemyBoss(pos, this);
       this.add(boss);
+  }
+
+  Game.prototype.startStageClear = function() {
+      this.stageClear = true;
+      this.stageClearTimer = 2; // 2 second countdown
+  }
+
+  Game.prototype.nextStage = function() {
+      this.stage++;
+      this.stageClear = false;
+      this.bossMode = false;
+      this.bossSpawned = false;
+      BHGame.config.baseSpeed += 0.2; // Increase difficulty
   }
 
   Game.prototype.bound = function (pos) {
