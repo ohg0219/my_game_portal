@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const winModal = document.getElementById('win-modal');
     const closeModalBtn = document.querySelector('.close-button');
     const finalTimeElement = document.getElementById('final-time');
+    const playAgainBtn = document.getElementById('playAgainBtn');
 
     const N = 9;
     let board = [];
@@ -176,6 +177,11 @@ document.addEventListener('DOMContentLoaded', () => {
         closeModalBtn.addEventListener('click', () => winModal.style.display = 'none');
         winModal.addEventListener('click', (e) => {
             if (e.target === winModal) winModal.style.display = 'none';
+        });
+
+        playAgainBtn.addEventListener('click', () => {
+            winModal.style.display = 'none';
+            startNewGame();
         });
     }
 

@@ -1,79 +1,134 @@
-/* 기본 스타일 */
-:root {
-    --board-bg: #fff;
-    --cell-bg: #f9f9f9;
-    --cell-border: #ddd;
-    --grid-border: #333;
-    --fixed-color: #333;
-    --user-color: #007bff;
-    --highlight-bg: #e6f2ff;
-    --error-color: #dc3545;
-    --button-bg: #007bff;
-    --button-hover-bg: #0056b3;
+/* --- 기본 및 공통 스타일 --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    background: linear-gradient(135deg, #6a82fb 0%, #fc5c7d 100%);
     min-height: 100vh;
-    background-color: #f0f2f5;
-    margin: 0;
+    padding: 20px;
     -webkit-tap-highlight-color: transparent;
 }
 
 .container {
+    max-width: 600px;
     width: 100%;
-    max-width: 500px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+/* --- 글래스모피즘 컨테이너 --- */
+.game-header, .difficulty-selector, .game-board, .game-controls, .modal-content {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(15px);
+    border-radius: 15px;
     padding: 20px;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-header {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
     margin-bottom: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
 }
 
-header h1 {
-    margin: 0;
-    font-size: 2rem;
-}
-
-.header-controls {
-    display: flex;
-    align-items: center;
-}
-
+/* --- 뒤로가기 버튼 --- */
 .back-button {
-    font-size: 0.9rem;
-    color: #555;
+    position: absolute;
+    top: 20px;
+    left: 20px;
+}
+
+.back-link {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
     text-decoration: none;
-    margin-right: 15px;
+    padding: 10px 20px;
+    border-radius: 25px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    transition: all 0.3s ease;
+    display: inline-block;
 }
 
-.timer {
+.back-link:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+/* --- 헤더 --- */
+.game-header h1 {
+    color: white;
+    font-size: 2rem;
+    margin-bottom: 15px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+}
+
+.game-stats {
+    display: flex;
+    justify-content: center;
+}
+
+.stat {
+    background: rgba(0, 0, 0, 0.1);
+    padding: 10px 20px;
+    border-radius: 10px;
+}
+
+.stat-label {
+    display: block;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.9rem;
+}
+
+.stat-value {
+    color: white;
     font-size: 1.2rem;
-    font-weight: 500;
-    color: #333;
+    font-weight: bold;
 }
 
-/* 스도쿠 보드 */
+/* --- 난이도 선택 --- */
+.difficulty-selector h2 {
+    color: white;
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+}
+
+.difficulty-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.difficulty-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+    padding: 10px 15px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.difficulty-btn:hover, .difficulty-btn.active {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* --- 스도쿠 보드 --- */
 #sudoku-board {
     display: grid;
     grid-template-columns: repeat(9, 1fr);
-    grid-template-rows: repeat(9, 1fr);
     width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
     aspect-ratio: 1 / 1;
-    border: 3px solid var(--grid-border);
-    background-color: var(--board-bg);
-    margin-bottom: 20px;
+    border: 3px solid rgba(255, 255, 255, 0.8);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(0,0,0,0.2);
 }
 
 .cell {
@@ -82,49 +137,40 @@ header h1 {
     align-items: center;
     font-size: clamp(1rem, 5vw, 1.8rem);
     font-weight: 500;
-    border: 1px solid var(--cell-border);
-    background-color: var(--cell-bg);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
     cursor: pointer;
     transition: background-color 0.2s;
 }
 
-.cell:nth-child(3n) { border-right: 2px solid var(--grid-border); }
-.cell:nth-child(9n) { border-right: none; }
+.cell:nth-child(3n):not(:nth-child(9n)) { border-right: 2px solid rgba(255, 255, 255, 0.5); }
 .cell:nth-child(n+19):nth-child(-n+27),
 .cell:nth-child(n+46):nth-child(-n+54) {
-    border-bottom: 2px solid var(--grid-border);
+    border-bottom: 2px solid rgba(255, 255, 255, 0.5);
 }
 
 .cell.fixed {
-    color: var(--fixed-color);
+    color: #fff;
     font-weight: bold;
     cursor: not-allowed;
-    background-color: #eee;
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
 .cell.user-input {
-    color: var(--user-color);
+    color: #a7ffeb; /* 민트색 */
 }
 
 .cell.selected {
-    background-color: var(--highlight-bg);
+    background-color: rgba(255, 255, 255, 0.3);
     position: relative;
 }
-.cell.selected::after {
-    content: '';
-    position: absolute;
-    top: -2px; left: -2px; right: -2px; bottom: -2px;
-    border: 2px solid var(--user-color);
-    pointer-events: none;
-}
-
 
 .cell.highlighted {
-    background-color: var(--highlight-bg);
+    background-color: rgba(255, 255, 255, 0.2);
 }
 
 .cell.error {
-    color: var(--error-color);
+    color: #ff8a80; /* 밝은 빨강 */
     animation: shake 0.3s;
 }
 
@@ -134,113 +180,90 @@ header h1 {
     75% { transform: translateX(3px); }
 }
 
-/* 컨트롤 */
-.controls {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    margin-bottom: 20px;
-}
+/* --- 컨트롤 --- */
+.game-controls { padding: 15px; }
 
 #number-palette {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     gap: 10px;
+    margin-bottom: 15px;
 }
 
-.number-btn, .action-buttons button {
-    padding: 10px;
+.number-btn {
+    aspect-ratio: 1.5 / 1;
     font-size: 1.2rem;
     font-weight: bold;
-    border: none;
-    border-radius: 5px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
     cursor: pointer;
-    background-color: #fff;
-    border: 1px solid #ccc;
-    transition: background-color 0.2s, transform 0.1s;
+    background-color: rgba(255, 255, 255, 0.15);
+    color: white;
+    transition: all 0.2s;
 }
-
-.number-btn:hover, .action-buttons button:hover {
-    background-color: #f0f0f0;
-}
-.number-btn:active, .action-buttons button:active {
-    transform: scale(0.95);
+.number-btn:hover {
+    background-color: rgba(255, 255, 255, 0.3);
 }
 
 .action-buttons {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-}
-.action-buttons button {
-    background-color: var(--button-bg);
-    color: white;
-}
-.action-buttons button:hover {
-    background-color: var(--button-hover-bg);
-}
-
-/* 난이도 선택 */
-#difficulty-selector {
     display: flex;
     gap: 10px;
-    align-items: center;
+    justify-content: center;
 }
-.difficulty-btn {
-    padding: 8px 15px;
-    border: 1px solid #ccc;
-    background-color: #fff;
-    border-radius: 5px;
+
+.control-btn {
+    background: linear-gradient(45deg, #fd79a8, #e84393);
+    border: none;
+    border-radius: 25px;
+    padding: 12px 25px;
+    color: white;
+    font-size: 1rem;
+    font-weight: bold;
     cursor: pointer;
+    transition: all 0.3s ease;
 }
-.difficulty-btn.active {
-    background-color: var(--button-bg);
-    color: white;
-    border-color: var(--button-bg);
+.control-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
 }
 
-/* 승리 모달 */
+/* --- 모달 --- */
 .modal {
-    position: fixed;
-    z-index: 100;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.5);
-    display: flex;
+    display: none;
+    position: fixed; top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
     justify-content: center;
     align-items: center;
 }
+.modal.show { display: flex; }
+
 .modal-content {
-    background-color: #fff;
     padding: 30px;
-    border-radius: 10px;
-    text-align: center;
-    position: relative;
+    color: #333;
 }
+.modal-content h2 { color: #333; margin-bottom: 20px; }
+.final-stats p { margin-bottom: 10px; }
 .close-button {
-    position: absolute;
-    top: 10px;
-    right: 15px;
-    font-size: 24px;
-    font-weight: bold;
-    cursor: pointer;
+    position: absolute; top: 15px; right: 20px;
+    font-size: 28px; color: #555; cursor: pointer;
+}
+.modal-buttons {
+    display: flex; justify-content: center;
+}
+.modal-btn {
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    border: none; border-radius: 25px; padding: 12px 25px;
+    color: white; font-size: 1rem; font-weight: bold;
+    cursor: pointer; transition: all 0.3s ease;
+}
+.modal-btn:hover {
+    transform: translateY(-2px);
 }
 
-/* 반응형 디자인 */
-@media (max-width: 500px) {
-    body {
-        min-height: -webkit-fill-available; /* iOS Safari */
-        height: 100vh;
-    }
-    .container {
-        padding: 10px;
-        height: 100%;
-        justify-content: space-around;
-    }
-    header h1 { font-size: 1.8rem; }
-    #number-palette { grid-template-columns: repeat(5, 1fr); }
-    .action-buttons { grid-template-columns: 1fr 1fr 1fr; }
+/* --- 반응형 --- */
+@media (max-width: 640px) {
+    .container { padding: 10px; }
+    .back-button { position: static; margin-bottom: 15px; }
 }
