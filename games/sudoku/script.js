@@ -1,4 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Safari 등에서 더블클릭으로 확대되는 것을 막기 위한 추가 조치
+    window.addEventListener('dblclick', (e) => {
+        e.preventDefault();
+    }, { passive: false });
+
     // --- DOM 요소 및 게임 상태 변수 ---
     const boardElement = document.getElementById('sudoku-board');
     const numberPalette = document.getElementById('number-palette');
