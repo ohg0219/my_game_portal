@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const boardElement = document.getElementById('game-board');
     const gameInfoElement = document.querySelector('.game-info p');
     const P = 'pawn', R = 'rook', N = 'knight', B = 'bishop', Q = 'queen', K = 'king';
-    const W = 'white', BL = 'black';
+    const W = 'piece-white', BL = 'piece-black';
 
     const initialBoard = [
         { piece: R, color: BL }, { piece: N, color: BL }, { piece: B, color: BL }, { piece: Q, color: BL }, { piece: K, color: BL }, { piece: B, color: BL }, { piece: N, color: BL }, { piece: R, color: BL },
@@ -16,8 +16,12 @@ document.addEventListener('DOMContentLoaded', () => {
     ];
 
     const pieceSymbols = {
-        [W]: { [K]: '♔', [Q]: '♕', [R]: '♖', [B]: '♗', [N]: '♘', [P]: '♙' },
-        [BL]: { [K]: '♚', [Q]: '♛', [R]: '♜', [B]: '♝', [N]: '♞', [P]: '♟' }
+        [W]: {
+            [K]: '♔\uFE0E', [Q]: '♕\uFE0E', [R]: '♖\uFE0E', [B]: '♗\uFE0E', [N]: '♘\uFE0E', [P]: '♙\uFE0E'
+        },
+        [BL]: {
+            [K]: '♚\uFE0E', [Q]: '♛\uFE0E', [R]: '♜\uFE0E', [B]: '♝\uFE0E', [N]: '♞\uFE0E', [P]: '♟\uFE0E'
+        }
     };
 
     let boardState = [...initialBoard];
