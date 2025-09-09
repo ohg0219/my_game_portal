@@ -2,23 +2,19 @@
   window.BHGame = window.BHGame || {};
 
   var Ship = (window.BHGame.Ship = function(pos, game) {
-    BHGame.MovingObject.call(this, pos, [0, 0], Ship.RADIUS, Ship.COLOR, game);
+    BHGame.MovingObject.call(this, pos, [0, 0], Ship.RADIUS, 'white', game);
     this.isBounded = true;
   });
 
   Ship.RADIUS = 15;
-  Ship.COLOR = 'white';
 
   BHGame.Util.inherits(Ship, BHGame.MovingObject);
 
   Ship.prototype.draw = function(ctx) {
-    ctx.fillStyle = this.color;
-    ctx.beginPath();
-    ctx.moveTo(this.pos[0], this.pos[1] - Ship.RADIUS);
-    ctx.lineTo(this.pos[0] - Ship.RADIUS, this.pos[1] + Ship.RADIUS);
-    ctx.lineTo(this.pos[0] + Ship.RADIUS, this.pos[1] + Ship.RADIUS);
-    ctx.closePath();
-    ctx.fill();
+    ctx.font = "30px Arial";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText("🚀", this.pos[0], this.pos[1]);
   };
 
   Ship.prototype.collideWith = function(otherObject) {
@@ -48,8 +44,8 @@
   };
 
   Ship.prototype.move = function(delta) {
-    this.pos[0] += this.vel[0] * delta * 5;
-    this.pos[1] += this.vel[1] * delta * 5;
+    this.pos[0] += this.vel[0] * delta * 150;
+    this.pos[1] += this.vel[1] * delta * 150;
     this.vel = [0,0]; // Reset velocity after each move
 
     if (this.game.isOutOfBounds(this.pos)) {

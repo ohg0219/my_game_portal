@@ -9,15 +9,21 @@
       vel,
       Enemy1.HEALTH,
       Enemy1.RADIUS,
-      Enemy1.COLOR,
+      'white',
       game
     );
   };
 
   Enemy1.RADIUS = 15;
-  Enemy1.COLOR = "cyan";
   Enemy1.HEALTH = 30;
 
   BHGame.Util.inherits(Enemy1, BHGame.EnemyObject);
+
+  Enemy1.prototype.draw = function(ctx) {
+    ctx.font = "30px Arial";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText("🛸", this.pos[0], this.pos[1]);
+  };
 
 })();

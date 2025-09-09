@@ -2,11 +2,41 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>탄막 슈팅 게임</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+    <title>🚀 탄막 슈팅 게임</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <canvas id="game-canvas"></canvas>
+    <div class="container">
+        <div class="header">
+            <a href="../../" class="back-button">🏠 게임 목록으로</a>
+            <h1>탄막 슈팅</h1>
+        </div>
+
+        <div id="instructions">
+            <h2>게임 방법</h2>
+            <p><strong>PC:</strong> WASD 또는 방향키로 이동, Spacebar로 발사</p>
+            <p><strong>모바일:</strong> 화면의 버튼을 사용하여 이동 및 발사</p>
+            <button id="start-game-btn">게임 시작</button>
+        </div>
+
+        <div class="game-container">
+            <canvas id="game-canvas"></canvas>
+        </div>
+
+        <div class="mobile-controls">
+            <div class="d-pad">
+                <button class="control-btn" data-direction="w">↑</button>
+                <button class="control-btn" data-direction="a">←</button>
+                <button class="control-btn" data-direction="s">↓</button>
+                <button class="control-btn" data-direction="d">→</button>
+            </div>
+            <div class="action-buttons">
+                <button class="control-btn fire-btn" id="fire-btn">🚀</button>
+            </div>
+        </div>
+    </div>
+
     <script src="lib/utils.js"></script>
     <script src="lib/movingObject.js"></script>
     <script src="lib/bullet.js"></script>
@@ -19,11 +49,29 @@
     <script>
       window.onload = function () {
         const canvas = document.getElementById('game-canvas');
-        canvas.width = 800;
-        canvas.height = 600;
-        const ctx = canvas.getContext('2d');
-        const game = new BHGame.Game();
-        new BHGame.GameView(game, ctx).start();
+        const instructions = document.getElementById('instructions');
+        const startBtn = document.getElementById('start-game-btn');
+        const gameContainer = document.querySelector('.game-container');
+
+        // Initially hide the game canvas
+        gameContainer.style.display = 'none';
+
+        startBtn.onclick = function() {
+            instructions.style.display = 'none';
+            gameContainer.style.display = 'block';
+
+            // Set canvas size based on container
+            const containerWidth = gameContainer.offsetWidth;
+            canvas.width = Math.min(containerWidth, 800);
+            canvas.height = canvas.width * 0.75; // 4:3 aspect ratio
+
+            BHGame.Game.DIM_X = canvas.width;
+            BHGame.Game.DIM_Y = canvas.height;
+
+            const ctx = canvas.getContext('2d');
+            const game = new BHGame.Game();
+            new BHGame.GameView(game, ctx).start();
+        };
       }
     </script>
 </body>
