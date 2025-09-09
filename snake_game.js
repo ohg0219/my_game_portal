@@ -25,13 +25,80 @@ class SnakeGame {
         this.currentDifficulty = 'beginner';
         this.gameLoop = null;
         
+        // 최고 점수 시스템
+        this.highScores = this.loadHighScores();
+        
         this.initializeGame();
         this.setupEventListeners();
+    }
+    
+    // 최고 점수 로드
+    loadHighScores() {
+        const saved = localStorage.getItem('snakeGameHighScores');
+        if (saved) {
+            return JSON.parse(saved);
+        }
+        
+        // 기본값
+        return {
+            beginner: 0,
+            intermediate: 0,
+            expert: 0,
+            master: 0
+        };
+    }
+    
+    // 최고 점수 저장
+    saveHighScores() {
+        localStorage.setItem('snakeGameHighScores', JSON.stringify(this.highScores));
+    }
+    
+    // 최고 점수 업데이트
+    updateHighScore() {
+        if (this.score > this.highScores[this.currentDifficulty]) {
+            this.highScores[this.currentDifficulty] = this.score;
+            this.saveHighScores();
+            return true; // 새 기록 달성
+        }
+        return false;
+    }
+    
+    // 최고 점수 표시 업데이트
+    updateHighScoreDisplay() {
+        const currentHighScore = this.highScores[this.currentDifficulty];
+        const highScoreElement = document.getElementById('highScore');
+        if (highScoreElement) {
+            highScoreElement.textContent = currentHighScore;
+        }
     }
     
     initializeGame() {
         this.showScreen('difficultyScreen');
         this.generateFood();
+        this.updateDifficultyHighScores();
+    }
+    
+    // 난이도 선택 화면에 최고 점수 표시
+    updateDifficultyHighScores() {
+        document.querySelectorAll('.difficulty-btn').forEach(btn => {
+            const level = btn.dataset.level;
+            const highScore = this.highScores[level];
+            
+            // 기존 최고 점수 표시 제거
+            const existingHighScore = btn.querySelector('.high-score-display');
+            if (existingHighScore) {
+                existingHighScore.remove();
+            }
+            
+            // 새 최고 점수 표시 추가
+            if (highScore > 0) {
+                const highScoreDiv = document.createElement('div');
+                highScoreDiv.className = 'high-score-display';
+                highScoreDiv.style.cssText = 'font-size: 0.8rem; color: #FFD700; margin-top: 5px;';
+                highScoreDiv.textContent = `최고 점수: ${highScore}`;
+                btn.appendChild(highScoreDiv);
+            }
+        });
     }
     
     setupEventListeners() {
@@ -100,8 +167,32 @@ class SnakeGame {
         // 난이도 변경 버튼
         document.getElementById('changeDifficultyBtn').addEventListener('click', () => {
             this.resetGame();
+            this.updateDifficultyHighScores();
             this.showScreen('difficultyScreen');
         });
+        
+        // 최고 점수 초기화 버튼 (숨겨진 기능)
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.shiftKey && e.key === 'R') {
+                if (confirm('모든 최고 점수를 초기화하시겠습니까?')) {
+                    this.resetAllHighScores();
+                }
+            }
+        });
+    }
+    
+    // 모든 최고 점수 초기화
+    resetAllHighScores() {
+        this.highScores = {
+            beginner: 0,
+            intermediate: 0,
+            expert: 0,
+            master: 0
+        };
+        this.saveHighScores();
+        this.updateDifficultyHighScores();
+        this.updateHighScoreDisplay();
+        alert('모든 최고 점수가 초기화되었습니다.');
     }
     
     startGame() {
@@ -180,7 +271,26 @@ class SnakeGame {
             this.score += 10;
             this.generateFood();
             this.updateUI();
+            
+            // 파티클 효과 (선택사항)
+            this.createFoodParticles(this.food.x * this.gridSize, this.food.y * this.gridSize);
         }
+    }
+    
+    // 간단한 파티클 효과
+    createFoodParticles(x, y) {
+        // 여기에 파티클 효과 코드를 추가할 수 있습니다
+        // 현재는 간단한 애니메이션으로 대체
+        const canvas = this.canvas;
+        const ctx = this.ctx;
+        
+        // 점수 증가 텍스트 표시
+        ctx.save();
+        ctx.font = 'bold 16px Arial';
+        ctx.fillStyle = '#FFD700';
+        ctx.textAlign = 'center';
+        ctx.fillText('+10', x + this.gridSize/2, y - 10);
+        ctx.restore();
     }
     
     generateFood() {
@@ -254,16 +364,33 @@ class SnakeGame {
     updateUI() {
         document.getElementById('score').textContent = this.score;
         document.getElementById('currentDifficulty').textContent = this.difficulties[this.currentDifficulty].name;
+        this.updateHighScoreDisplay();
     }
     
     gameOver() {
         this.gameRunning = false;
         clearInterval(this.gameLoop);
         
+        // 최고 점수 확인
+        const isNewRecord = this.updateHighScore();
+        
         document.getElementById('finalScore').textContent = this.score;
         document.getElementById('finalDifficulty').textContent = this.difficulties[this.currentDifficulty].name;
+        document.getElementById('finalHighScore').textContent = this.highScores[this.currentDifficulty];
+        
+        // 새 기록 달성 시 축하 메시지
+        const newRecordElement = document.getElementById('newRecord');
+        if (newRecordElement) {
+            if (isNewRecord && this.score > 0) {
+                newRecordElement.style.display = 'block';
+                newRecordElement.textContent = '🎉 새로운 최고 기록 달성! 🎉';
+            } else {
+                newRecordElement.style.display = 'none';
+            }
+        }
         
         this.showScreen('gameOverScreen');
+        this.updateDifficultyHighScores();
     }
     
     showScreen(screenId) {
