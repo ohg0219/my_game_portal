@@ -130,12 +130,20 @@
   };
 
   Ship.prototype.fireBullet = function() {
-    const spreadAngle = 15;
-    const totalAngle = (this.missileLevel - 1) * spreadAngle;
+    const MAX_SPREAD_LEVEL = 5;
+    const BASE_SPREAD_ANGLE = 15; // The angle between missiles at lower levels
+
+    // Cap the spread width at level 5
+    const effectiveSpreadLevel = Math.min(this.missileLevel, MAX_SPREAD_LEVEL);
+    const totalAngle = (effectiveSpreadLevel - 1) * BASE_SPREAD_ANGLE;
+
+    // For level 1, angleStep is 0. For >1, calculate step to fill totalAngle
+    const angleStep = this.missileLevel > 1 ? totalAngle / (this.missileLevel - 1) : 0;
+
     const startAngle = -totalAngle / 2;
 
     for (let i = 0; i < this.missileLevel; i++) {
-        const angle = startAngle + i * spreadAngle;
+        const angle = startAngle + i * angleStep;
         const rad = angle * (Math.PI / 180);
         const vel = [Math.sin(rad) * 8, -Math.cos(rad) * 8];
         const bullet = new BHGame.Bullet(this.pos.slice(), vel, this.game);
