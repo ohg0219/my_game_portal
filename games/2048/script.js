@@ -116,6 +116,13 @@ class Game2048 {
             });
         });
         
+        // 윈도우 리사이즈 이벤트
+        window.addEventListener('resize', () => {
+            setTimeout(() => {
+                this.renderBoard();
+            }, 100);
+        });
+        
         // 게임 컨트롤 버튼
         document.getElementById('new-game-btn').addEventListener('click', () => {
             this.newGame();
@@ -351,8 +358,51 @@ class Game2048 {
         return moved;
     }
     
+    getTileSize() {
+        // 화면 크기에 따른 타일 크기 계산
+        const screenWidth = window.innerWidth;
+        
+        if (screenWidth <= 480) {
+            return { size: 70, gap: 10, fontSize: {
+                normal: 35,
+                medium: 30,
+                small: 24,
+                tiny: 20
+            }};
+        } else if (screenWidth <= 600) {
+            return { size: 80, gap: 10, fontSize: {
+                normal: 45,
+                medium: 35,
+                small: 28,
+                tiny: 24
+            }};
+        } else {
+            return { size: 100, gap: 15, fontSize: {
+                normal: 55,
+                medium: 45,
+                small: 35,
+                tiny: 30
+            }};
+        }
+    }
+    
+    getTileFontSize(value) {
+        const { fontSize } = this.getTileSize();
+        
+        if (value >= 1024) {
+            return fontSize.tiny;
+        } else if (value >= 128) {
+            return fontSize.small;
+        } else if (value >= 16) {
+            return fontSize.medium;
+        } else {
+            return fontSize.normal;
+        }
+    }
+    
     renderBoard() {
         const container = document.getElementById('tile-container');
+        const { size: tileSize, gap } = this.getTileSize();
         
         // 기존 타일들 제거 (애니메이션과 함께)
         const existingTiles = Array.from(container.children);
@@ -376,9 +426,14 @@ class Game2048 {
                         tile.setAttribute('data-col', j);
                         tile.setAttribute('data-value', this.board[i][j]);
                         
-                        // 위치 계산
-                        const x = j * 115; // 100px + 15px gap
-                        const y = i * 115;
+                        // 반응형 위치 계산
+                        const x = j * (tileSize + gap);
+                        const y = i * (tileSize + gap);
+                        
+                        // 타일 크기 및 폰트 크기 설정
+                        tile.style.width = tileSize + 'px';
+                        tile.style.height = tileSize + 'px';
+                        tile.style.fontSize = this.getTileFontSize(this.board[i][j]) + 'px';
                         
                         // 시작은 약간 작게, 투명하게
                         tile.style.transform = `translate(${x}px, ${y}px) scale(0.9)`;

@@ -169,6 +169,7 @@ body {
     height: 100px;
     background: rgba(238, 228, 218, 0.35);
     border-radius: 6px;
+    flex: 0 0 auto;
 }
 
 .tile-container {
@@ -183,16 +184,14 @@ body {
 /* 타일 스타일 */
 .tile {
     position: absolute;
-    width: 100px;
-    height: 100px;
     border-radius: 6px;
     font-weight: bold;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 55px;
     transition: all 0.2s ease-in-out;
     z-index: 10;
+    font-family: 'Arial', sans-serif;
 }
 
 .tile.tile-new {
@@ -211,12 +210,12 @@ body {
 .tile-16 { background: #f59563; color: #f9f6f2; }
 .tile-32 { background: #f67c5f; color: #f9f6f2; }
 .tile-64 { background: #f65e3b; color: #f9f6f2; }
-.tile-128 { background: #edcf72; color: #f9f6f2; font-size: 45px; }
-.tile-256 { background: #edcc61; color: #f9f6f2; font-size: 45px; }
-.tile-512 { background: #edc850; color: #f9f6f2; font-size: 45px; }
-.tile-1024 { background: #edc53f; color: #f9f6f2; font-size: 35px; }
-.tile-2048 { background: #edc22e; color: #f9f6f2; font-size: 35px; box-shadow: 0 0 30px rgba(243, 215, 116, 0.5); }
-.tile-super { background: #3c3a32; color: #f9f6f2; font-size: 30px; }
+.tile-128 { background: #edcf72; color: #f9f6f2; }
+.tile-256 { background: #edcc61; color: #f9f6f2; }
+.tile-512 { background: #edc850; color: #f9f6f2; }
+.tile-1024 { background: #edc53f; color: #f9f6f2; }
+.tile-2048 { background: #edc22e; color: #f9f6f2; box-shadow: 0 0 30px rgba(243, 215, 116, 0.5); }
+.tile-super { background: #3c3a32; color: #f9f6f2; }
 
 /* 조작법 안내 */
 .instructions {
@@ -408,31 +407,6 @@ body {
 }
 
 @media (max-width: 600px) {
-    .grid-cell,
-    .tile {
-        width: 80px;
-        height: 80px;
-    }
-    
-    .tile {
-        font-size: 45px;
-    }
-    
-    .tile-128,
-    .tile-256,
-    .tile-512 {
-        font-size: 35px;
-    }
-    
-    .tile-1024,
-    .tile-2048 {
-        font-size: 28px;
-    }
-    
-    .tile-super {
-        font-size: 24px;
-    }
-    
     .game-container {
         padding: 10px;
     }
@@ -440,6 +414,11 @@ body {
     .grid-row {
         gap: 10px;
         margin-bottom: 10px;
+    }
+    
+    .grid-cell {
+        width: 80px;
+        height: 80px;
     }
     
     .tile-container {
@@ -460,29 +439,25 @@ body {
         margin-bottom: 15px;
     }
     
-    .grid-cell,
-    .tile {
+    .game-container {
+        padding: 10px;
+    }
+    
+    .grid-row {
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+    
+    .grid-cell {
         width: 70px;
         height: 70px;
     }
     
-    .tile {
-        font-size: 35px;
-    }
-    
-    .tile-128,
-    .tile-256,
-    .tile-512 {
-        font-size: 30px;
-    }
-    
-    .tile-1024,
-    .tile-2048 {
-        font-size: 24px;
-    }
-    
-    .tile-super {
-        font-size: 20px;
+    .tile-container {
+        top: 10px;
+        left: 10px;
+        width: calc(100% - 20px);
+        height: calc(100% - 20px);
     }
     
     .game-over-popup,
