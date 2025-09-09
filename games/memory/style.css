@@ -1,0 +1,301 @@
+/* 메모리 게임 준비중 페이지 스타일 */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #74b9ff 0%, #0984e3 50%, #6c5ce7 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.container {
+    max-width: 600px;
+    width: 100%;
+    text-align: center;
+}
+
+/* 뒤로가기 버튼 */
+.back-button {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+}
+
+.back-link {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    text-decoration: none;
+    padding: 10px 20px;
+    border-radius: 25px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    transition: all 0.3s ease;
+    display: inline-block;
+}
+
+.back-link:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+/* 메인 콘텐츠 */
+.coming-soon {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(15px);
+    border-radius: 20px;
+    padding: 40px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.game-icon {
+    font-size: 5rem;
+    margin-bottom: 20px;
+    animation: pulse 2s infinite;
+}
+
+.coming-soon h1 {
+    color: white;
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.coming-soon h2 {
+    color: #fdcb6e;
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+    font-weight: normal;
+}
+
+.description {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 30px;
+}
+
+.description p {
+    margin-bottom: 10px;
+}
+
+/* 기능 목록 */
+.preview-features {
+    text-align: left;
+    margin-bottom: 30px;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 20px;
+    border-radius: 15px;
+}
+
+.preview-features h3 {
+    color: white;
+    font-size: 1.3rem;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.preview-features ul {
+    list-style: none;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.preview-features li {
+    margin-bottom: 8px;
+    padding-left: 10px;
+    font-size: 1rem;
+}
+
+/* 진행률 바 */
+.progress {
+    margin-bottom: 30px;
+}
+
+.progress h3 {
+    color: white;
+    margin-bottom: 15px;
+}
+
+.progress-bar {
+    background: rgba(255, 255, 255, 0.2);
+    height: 20px;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.progress-fill {
+    background: linear-gradient(90deg, #00b894, #00cec9);
+    height: 100%;
+    border-radius: 10px;
+    transition: width 0.5s ease;
+    animation: shimmer 2s infinite;
+}
+
+.progress-text {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.9rem;
+}
+
+/* 버튼들 */
+.buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 30px;
+}
+
+.notify-btn, .play-other-btn {
+    padding: 12px 25px;
+    border: none;
+    border-radius: 25px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.notify-btn {
+    background: linear-gradient(45deg, #fd79a8, #e84393);
+    color: white;
+}
+
+.notify-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(232, 67, 147, 0.4);
+}
+
+.play-other-btn {
+    background: linear-gradient(45deg, #00b894, #00cec9);
+    color: white;
+}
+
+.play-other-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 206, 201, 0.4);
+}
+
+/* 베타 미리보기 */
+.beta-preview {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 20px;
+    border-radius: 15px;
+    margin-top: 20px;
+}
+
+.beta-preview h3 {
+    color: white;
+    margin-bottom: 20px;
+}
+
+.preview-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 60px);
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+
+.preview-card {
+    width: 60px;
+    height: 60px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.preview-card:hover {
+    transform: scale(1.05);
+}
+
+.preview-card:not(.flipped) {
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    color: white;
+}
+
+.preview-note {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.8rem;
+    font-style: italic;
+}
+
+/* 애니메이션 */
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+@keyframes shimmer {
+    0% { background-position: -200px 0; }
+    100% { background-position: 200px 0; }
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+    .coming-soon {
+        padding: 30px 20px;
+    }
+    
+    .coming-soon h1 {
+        font-size: 2rem;
+    }
+    
+    .coming-soon h2 {
+        font-size: 1.5rem;
+    }
+    
+    .buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .notify-btn, .play-other-btn {
+        width: 100%;
+        max-width: 250px;
+    }
+    
+    .preview-grid {
+        grid-template-columns: repeat(4, 50px);
+        gap: 8px;
+    }
+    
+    .preview-card {
+        width: 50px;
+        height: 50px;
+        font-size: 1.2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .back-button {
+        position: relative;
+        top: 0;
+        left: 0;
+        margin-bottom: 20px;
+    }
+    
+    .container {
+        padding-top: 0;
+    }
+    
+    .game-icon {
+        font-size: 4rem;
+    }
+}

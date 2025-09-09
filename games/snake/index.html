@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐍 스네이크 게임</title>
+    <link rel="stylesheet" href="snake_game.css">
+</head>
+<body>
+<div class="container">
+    <!-- 홈으로 돌아가기 버튼 -->
+    <div class="back-button">
+        <a href="../../" class="back-link">🏠 게임 목록으로</a>
+    </div>
+
+    <h1>🐍 스네이크 게임</h1>
+
+    <!-- 난이도 선택 화면 -->
+    <div id="difficultyScreen" class="screen">
+        <h2>난이도를 선택하세요</h2>
+        <div class="difficulty-buttons">
+            <button class="difficulty-btn" data-level="beginner">
+                <span class="level-name">초보</span>
+                <span class="level-desc">천천히 시작해보세요</span>
+            </button>
+            <button class="difficulty-btn" data-level="intermediate">
+                <span class="level-name">중수</span>
+                <span class="level-desc">적당한 속도로</span>
+            </button>
+            <button class="difficulty-btn" data-level="expert">
+                <span class="level-name">고수</span>
+                <span class="level-desc">빠른 속도에 도전!</span>
+            </button>
+            <button class="difficulty-btn" data-level="master">
+                <span class="level-name">신</span>
+                <span class="level-desc">극한의 속도!</span>
+            </button>
+        </div>
+        <div class="tip">
+            <p>💡 팁: Ctrl+Shift+R로 최고 점수를 초기화할 수 있습니다</p>
+        </div>
+    </div>
+
+    <!-- 게임 화면 -->
+    <div id="gameScreen" class="screen hidden">
+        <div class="game-info">
+            <div class="score-info">
+                <div class="score">점수: <span id="score">0</span></div>
+                <div class="high-score">최고: <span id="highScore">0</span></div>
+            </div>
+            <div class="difficulty">난이도: <span id="currentDifficulty"></span></div>
+            <button id="pauseBtn" class="control-btn">일시정지</button>
+        </div>
+
+        <canvas id="gameCanvas" width="400" height="400"></canvas>
+
+        <div class="controls">
+            <p>방향키로 뱀을 조종하세요!</p>
+            <div class="control-keys">
+                <div class="key-row">
+                    <button class="arrow-key" data-direction="up">↑</button>
+                </div>
+                <div class="key-row">
+                    <button class="arrow-key" data-direction="left">←</button>
+                    <button class="arrow-key" data-direction="down">↓</button>
+                    <button class="arrow-key" data-direction="right">→</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 게임 오버 화면 -->
+    <div id="gameOverScreen" class="screen hidden">
+        <h2>게임 오버!</h2>
+        <div id="newRecord" style="display: none; color: #FFD700; font-size: 1.1rem; margin: 10px 0;"></div>
+        <div class="final-score">
+            <p>최종 점수: <span id="finalScore">0</span></p>
+            <p>난이도: <span id="finalDifficulty"></span></p>
+            <p>최고 점수: <span id="finalHighScore">0</span></p>
+        </div>
+        <div class="game-over-buttons">
+            <button id="restartBtn" class="control-btn">다시 시작</button>
+            <button id="changeDifficultyBtn" class="control-btn">난이도 변경</button>
+            <a href="../../" class="control-btn">게임 목록으로</a>
+        </div>
+    </div>
+</div>
+
+<script src="snake_game.js"></script>
+</body>
+</html>
