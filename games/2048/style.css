@@ -8,8 +8,8 @@
 
 body {
     font-family: 'Arial', sans-serif;
-    background: linear-gradient(135deg, #faf8ef 0%, #f2ede4 100%);
-    color: #776e65;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
     min-height: 100vh;
     display: flex;
     justify-content: center;
@@ -36,32 +36,33 @@ body {
 }
 
 .back-link {
-    background: #8f7a66;
-    color: #f9f6f2;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
     text-decoration: none;
-    padding: 8px 16px;
-    border-radius: 6px;
-    font-size: 14px;
-    font-weight: bold;
+    padding: 10px 20px;
+    border-radius: 25px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
     transition: all 0.3s ease;
+    display: inline-block;
 }
 
 .back-link:hover {
-    background: #9f8a76;
-    transform: translateY(-1px);
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
 }
 
 .header h1 {
     font-size: 4rem;
     font-weight: bold;
-    color: #776e65;
+    color: white;
     margin-bottom: 10px;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
 }
 
 .subtitle {
     font-size: 1.1rem;
-    color: #776e65;
+    color: rgba(255, 255, 255, 0.9);
     margin-bottom: 20px;
 }
 
@@ -80,9 +81,11 @@ body {
 }
 
 .score-box {
-    background: #bbada0;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
     padding: 10px 20px;
-    border-radius: 6px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
     color: white;
     min-width: 70px;
 }
@@ -105,12 +108,12 @@ body {
 }
 
 .btn {
-    background: #8f7a66;
-    color: #f9f6f2;
+    background: linear-gradient(45deg, #fd79a8, #e84393);
+    color: white;
     border: none;
-    padding: 10px 20px;
-    border-radius: 6px;
-    font-size: 14px;
+    padding: 12px 25px;
+    border-radius: 25px;
+    font-size: 1rem;
     font-weight: bold;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -119,8 +122,8 @@ body {
 }
 
 .btn:hover:not(:disabled) {
-    background: #9f8a76;
-    transform: translateY(-1px);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(232, 67, 147, 0.4);
 }
 
 .btn:disabled {
@@ -129,18 +132,20 @@ body {
 }
 
 .btn.primary {
-    background: #f65e3b;
+    background: linear-gradient(45deg, #00b894, #00cec9);
 }
 
 .btn.primary:hover {
-    background: #f67c5f;
+    box-shadow: 0 5px 15px rgba(0, 206, 201, 0.4);
 }
 
 /* 게임 보드 - 기본값 */
 .game-container {
     position: relative;
-    background: #bbada0;
-    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 15px;
     margin: 0 auto 20px auto;
     box-sizing: border-box;
 }
@@ -206,7 +211,7 @@ body {
 .instructions {
     margin-bottom: 20px;
     font-size: 14px;
-    color: #776e65;
+    color: rgba(255, 255, 255, 0.9);
 }
 
 .mobile-instructions {
@@ -230,10 +235,10 @@ body {
 .control-btn {
     width: 60px;
     height: 60px;
-    background: #8f7a66;
-    color: #f9f6f2;
-    border: none;
-    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
     font-size: 24px;
     font-weight: bold;
     cursor: pointer;
@@ -242,7 +247,7 @@ body {
 }
 
 .control-btn:hover {
-    background: #9f8a76;
+    background: rgba(255, 255, 255, 0.3);
     transform: scale(1.05);
 }
 
@@ -258,7 +263,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(255, 255, 255, 0.8);
+    background: rgba(0, 0, 0, 0.5);
     display: none;
     justify-content: center;
     align-items: center;
@@ -268,11 +273,13 @@ body {
 
 .game-over-popup,
 .victory-popup {
-    background: white;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(15px);
     padding: 40px;
-    border-radius: 15px;
+    border-radius: 20px;
     text-align: center;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     max-width: 400px;
     width: 90%;
 }
@@ -280,44 +287,60 @@ body {
 .game-over-popup h2,
 .victory-popup h2 {
     font-size: 2rem;
-    color: #776e65;
+    color: #333;
     margin-bottom: 15px;
 }
 
 .game-over-popup p,
 .victory-popup p {
     font-size: 1.1rem;
-    color: #776e65;
+    color: #555;
     margin-bottom: 20px;
 }
 
-.final-score,
-.victory-score {
+.final-stats {
     margin: 20px 0;
-    padding: 15px;
-    background: #f9f6f2;
-    border-radius: 8px;
+    color: #555;
 }
 
-.final-score span,
-.victory-score span {
-    font-weight: bold;
-    color: #f65e3b;
-    font-size: 1.3rem;
+.final-stats p {
+    margin-bottom: 10px;
+    font-size: 1.1rem;
 }
 
 #new-record {
-    color: #f65e3b;
+    color: #e84393;
     font-weight: bold;
     margin-top: 10px;
 }
 
-.game-over-buttons,
-.victory-buttons {
+.modal-buttons {
     display: flex;
-    flex-direction: column;
-    gap: 10px;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
     margin-top: 20px;
+}
+
+.modal-btn {
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    border: none;
+    border-radius: 25px;
+    padding: 12px 25px;
+    color: white;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.modal-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.modal-btn:first-child {
+    background: linear-gradient(45deg, #00b894, #00cec9);
 }
 
 /* 애니메이션 */
@@ -408,5 +431,13 @@ body {
     .game-over-popup,
     .victory-popup {
         padding: 30px 20px;
+    }
+    
+    .modal-buttons {
+        flex-direction: column;
+    }
+    
+    .modal-btn {
+        width: 100%;
     }
 }
