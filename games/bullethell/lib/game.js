@@ -214,7 +214,8 @@
   Game.prototype.spawnBoss = function() {
       this.enemies = [];
       const pos = [Game.DIM_X / 2, 100];
-      const boss = new BHGame.EnemyBoss(pos, this);
+      const health = this.stage * 10;
+      const boss = new BHGame.EnemyBoss(pos, this, health);
       this.add(boss);
   }
 

@@ -70,13 +70,14 @@
   };
 
   Ship.prototype.collideWith = function(otherObject) {
-    if (this.isDying || this.isInvincible || this.isShielded) {
-        return;
-    }
-
+    // Items can be collected even when invincible/shielded
     if (otherObject instanceof BHGame.Item) {
         this.activatePowerUp(otherObject.type);
         this.game.remove(otherObject);
+        return;
+    }
+
+    if (this.isDying || this.isInvincible || this.isShielded) {
         return;
     }
 
@@ -100,7 +101,7 @@
       this.game.displayPowerUpMessage(type);
       switch(type) {
           case 'missile':
-              this.missileLevel = Math.min(this.missileLevel + 1, 5);
+              this.missileLevel++;
               break;
           case 'life':
               this.game.lives = Math.min(this.game.lives + 1, 100);

@@ -1,13 +1,14 @@
 (function () {
   window.BHGame = window.BHGame || {};
 
-  var EnemyBoss = window.BHGame.EnemyBoss = function (pos, game) {
-    var vel = [1 * BHGame.config.baseSpeed, 0]; // Start moving right
+  var EnemyBoss = window.BHGame.EnemyBoss = function (pos, game, health) {
+    var speed = 2 * BHGame.config.baseSpeed * BHGame.config.enemySpeedMultiplier;
+    var vel = [speed, 0]; // Start moving right
     BHGame.EnemyObject.call(
       this,
       pos,
       vel,
-      10, // Health (10 hits)
+      health || 10,
       EnemyBoss.RADIUS,
       'white',
       game,
