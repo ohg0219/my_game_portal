@@ -15,13 +15,19 @@
 
         <div id="instructions">
             <h2>게임 방법</h2>
-            <p><strong>PC:</strong> WASD 또는 방향키로 이동, Spacebar로 발사</p>
-            <p><strong>모바일:</strong> 화면의 버튼을 사용하여 이동 및 발사</p>
+            <p><strong>PC:</strong> WASD 또는 방향키로 이동</p>
+            <p><strong>모바일:</strong> 화면의 버튼을 사용하여 이동</p>
+            <p>미사일은 자동으로 발사됩니다.</p>
             <button id="start-game-btn">게임 시작</button>
         </div>
 
         <div class="game-container">
             <canvas id="game-canvas"></canvas>
+            <div class="game-over-overlay" id="game-over-overlay">
+                <h2>게임 오버</h2>
+                <p>최종 점수: <span id="final-score">0</span></p>
+                <button id="restart-btn">다시 시작</button>
+            </div>
         </div>
 
         <div class="mobile-controls">
@@ -30,9 +36,6 @@
                 <button class="control-btn" data-direction="a">←</button>
                 <button class="control-btn" data-direction="s">↓</button>
                 <button class="control-btn" data-direction="d">→</button>
-            </div>
-            <div class="action-buttons">
-                <button class="control-btn fire-btn" id="fire-btn">🚀</button>
             </div>
         </div>
     </div>
@@ -51,27 +54,39 @@
         const canvas = document.getElementById('game-canvas');
         const instructions = document.getElementById('instructions');
         const startBtn = document.getElementById('start-game-btn');
+        const restartBtn = document.getElementById('restart-btn');
         const gameContainer = document.querySelector('.game-container');
+        const gameOverOverlay = document.getElementById('game-over-overlay');
 
-        // Initially hide the game canvas
-        gameContainer.style.display = 'none';
+        let gameView;
 
-        startBtn.onclick = function() {
-            instructions.style.display = 'none';
-            gameContainer.style.display = 'block';
-
-            // Set canvas size based on container
+        function setupCanvas() {
             const containerWidth = gameContainer.offsetWidth;
             canvas.width = Math.min(containerWidth, 800);
-            canvas.height = canvas.width * 0.75; // 4:3 aspect ratio
-
+            canvas.height = canvas.width * 0.75;
             BHGame.Game.DIM_X = canvas.width;
             BHGame.Game.DIM_Y = canvas.height;
+        }
+
+        function startGame() {
+            instructions.style.display = 'none';
+            gameOverOverlay.style.display = 'none';
+            gameContainer.style.display = 'block';
+
+            setupCanvas();
 
             const ctx = canvas.getContext('2d');
             const game = new BHGame.Game();
-            new BHGame.GameView(game, ctx).start();
-        };
+            gameView = new BHGame.GameView(game, ctx);
+            gameView.start();
+        }
+
+        startBtn.onclick = startGame;
+        restartBtn.onclick = startGame;
+
+        // Initially hide the game canvas and overlay
+        gameContainer.style.display = 'none';
+        gameOverOverlay.style.display = 'none';
       }
     </script>
 </body>
