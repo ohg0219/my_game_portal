@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const gameInfoElement = document.getElementById('gameMessage');
     const capturedWhiteElement = document.getElementById('captured-white');
     const capturedBlackElement = document.getElementById('captured-black');
+    const promotionScreen = document.getElementById('promotionScreen');
     const P = 'pawn', R = 'rook', N = 'knight', B = 'bishop', Q = 'queen', K = 'king';
     const W = 'piece-white', BL = 'piece-black';
 
@@ -39,6 +40,9 @@ document.addEventListener('DOMContentLoaded', () => {
     let whiteCaptured = [];
     let blackCaptured = [];
     let aiDifficulty = 'beginner';
+    let promotionMove = null;
+    let castlingRights = {};
+    let enPassantTargetSquare = null;
 
     function renderBoard() {
         boardElement.innerHTML = '';
@@ -62,6 +66,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
             boardElement.appendChild(square);
         });
+
+        // Highlight king if in check
+        const whiteKingIndex = boardState.findIndex(p => p && p.piece === K && p.color === W);
+        if (whiteKingIndex !== -1 && isSquareAttacked(whiteKingIndex, BL)) {
+            boardElement.querySelector(`[data-index='${whiteKingIndex}']`).classList.add('in-check');
+        }
+        const blackKingIndex = boardState.findIndex(p => p && p.piece === K && p.color === BL);
+        if (blackKingIndex !== -1 && isSquareAttacked(blackKingIndex, W)) {
+            boardElement.querySelector(`[data-index='${blackKingIndex}']`).classList.add('in-check');
+        }
+
         addSquareClickListeners();
     }
 
@@ -144,7 +159,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function movePiece(from, to) {
-        const capturedPiece = boardState[to];
+        let capturedPiece = boardState[to];
+
+        // Handle En Passant capture
+        const piece = boardState[from];
+        if (piece.piece === P && to === enPassantTargetSquare) {
+            const capturedPawnIndex = to + (piece.color === W ? 8 : -8);
+            capturedPiece = boardState[capturedPawnIndex];
+            boardState[capturedPawnIndex] = null;
+        }
+
         if (capturedPiece) {
             if (capturedPiece.color === BL) {
                 whiteCaptured.push(capturedPiece);
@@ -154,20 +178,91 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const piece = boardState[from];
+
+        // Handle castling move
+        if (piece.piece === K && Math.abs(from - to) === 2) {
+            // Kingside castle
+            if (to > from) {
+                const rook = boardState[to + 1];
+                boardState[to - 1] = rook;
+                boardState[to + 1] = null;
+            }
+            // Queenside castle
+            else {
+                const rook = boardState[to - 2];
+                boardState[to + 1] = rook;
+                boardState[to - 2] = null;
+            }
+        }
+
+        // Update castling rights if king or rook moves
+        if (piece.piece === K) {
+            if (piece.color === W) castlingRights.wKing = false;
+            else castlingRights.bKing = false;
+        }
+        if (piece.piece === R) {
+            if (piece.color === W) {
+                if (from === 56) castlingRights.wRookA = false;
+                if (from === 63) castlingRights.wRookH = false;
+            } else {
+                if (from === 0) castlingRights.bRookA = false;
+                if (from === 7) castlingRights.bRookH = false;
+            }
+        }
+
         boardState[to] = piece;
         boardState[from] = null;
 
         clearSelection();
+
+        // Check for pawn promotion
+        const promotionRank = piece.color === W ? 0 : 7;
+        const row = Math.floor(to / 8);
+        if (piece.piece === P && row === promotionRank) {
+            handlePromotion(to, piece.color);
+            return; // Pause game until promotion is chosen
+        }
+
         renderBoard();
         renderCapturedPieces();
 
+        // Set en passant target square
+        if (piece.piece === P && Math.abs(from - to) === 16) {
+            enPassantTargetSquare = (from + to) / 2;
+        } else {
+            enPassantTargetSquare = null;
+        }
+
+        continueGame();
+    }
+
+    function handlePromotion(squareIndex, color) {
+        promotionMove = { squareIndex, color };
+        promotionScreen.classList.remove('hidden');
+        // Game is paused, no more moves until a choice is made
+    }
+
+    function promotePawn(newPieceType) {
+        if (!promotionMove) return;
+
+        const { squareIndex, color } = promotionMove;
+        boardState[squareIndex] = { piece: newPieceType, color: color };
+
+        promotionMove = null;
+        promotionScreen.classList.add('hidden');
+
+        renderBoard();
+        renderCapturedPieces();
+        continueGame();
+    }
+
+    function continueGame() {
         currentPlayer = (currentPlayer === W) ? BL : W;
         updateGameInfo();
 
         checkGameOver();
 
         if (currentPlayer === BL && !isGameOver) {
-            // It's AI's turn, and the game is not over.
             setTimeout(aiMove, 1000);
         }
     }
@@ -423,6 +518,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (col < 7 && boardState[cap2] && boardState[cap2].color !== piece.color) {
             moves.push(cap2);
         }
+
+        // En Passant
+        if (enPassantTargetSquare) {
+            if (cap1 === enPassantTargetSquare && col > 0) moves.push(cap1);
+            if (cap2 === enPassantTargetSquare && col < 7) moves.push(cap2);
+        }
+
         return moves;
     }
 
@@ -462,6 +564,34 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         }
+
+        // Castling logic
+        if (!isSquareAttacked(index, opponentColor)) { // Can't castle out of check
+            if (piece.color === W) {
+                // Kingside
+                if (castlingRights.wKing && castlingRights.wRookH && !boardState[61] && !boardState[62] &&
+                    !isSquareAttacked(61, opponentColor) && !isSquareAttacked(62, opponentColor)) {
+                    moves.push(62);
+                }
+                // Queenside
+                if (castlingRights.wKing && castlingRights.wRookA && !boardState[59] && !boardState[58] && !boardState[57] &&
+                    !isSquareAttacked(59, opponentColor) && !isSquareAttacked(58, opponentColor)) {
+                    moves.push(58);
+                }
+            } else { // Black
+                // Kingside
+                if (castlingRights.bKing && castlingRights.bRookH && !boardState[5] && !boardState[6] &&
+                    !isSquareAttacked(5, opponentColor) && !isSquareAttacked(6, opponentColor)) {
+                    moves.push(6);
+                }
+                // Queenside
+                if (castlingRights.bKing && castlingRights.bRookA && !boardState[3] && !boardState[2] && !boardState[1] &&
+                    !isSquareAttacked(3, opponentColor) && !isSquareAttacked(2, opponentColor)) {
+                    moves.push(2);
+                }
+            }
+        }
+
         return moves;
     }
 
@@ -538,6 +668,8 @@ document.addEventListener('DOMContentLoaded', () => {
         isGameOver = false;
         whiteCaptured = [];
         blackCaptured = [];
+        castlingRights = { wKing: true, bKing: true, wRookA: true, wRookH: true, bRookA: true, bRookH: true };
+        enPassantTargetSquare = null;
         clearSelection();
         renderBoard();
         renderCapturedPieces();
@@ -556,6 +688,12 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
         document.getElementById('newGameBtn').addEventListener('click', resetGame);
+
+        document.querySelectorAll('.promotion-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                promotePawn(btn.dataset.piece);
+            });
+        });
     }
 
     init();

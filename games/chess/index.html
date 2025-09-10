@@ -33,18 +33,25 @@
             </div>
         </div>
 
-        <div id="gameScreen" class="hidden">
-            <div class="screen">
-                <div class="game-area">
-                    <div id="captured-white" class="captured-pieces"></div>
-                    <div id="game-board"></div>
-                    <div id="captured-black" class="captured-pieces"></div>
-                </div>
+        <div id="gameScreen" class="screen hidden">
+            <div class="game-area">
+                <div id="captured-white" class="captured-pieces"></div>
+                <div id="game-board"></div>
+                <div id="captured-black" class="captured-pieces"></div>
             </div>
-
             <div class="game-info">
                  <p id="gameMessage">플레이어(백)의 차례입니다.</p>
                  <button id="newGameBtn" class="control-btn">새 게임</button>
+            </div>
+        </div>
+
+        <div id="promotionScreen" class="screen hidden">
+            <h2>기물 선택</h2>
+            <div class="promotion-choices">
+                <button class="promotion-btn" data-piece="queen">♕</button>
+                <button class="promotion-btn" data-piece="rook">♖</button>
+                <button class="promotion-btn" data-piece="bishop">♗</button>
+                <button class="promotion-btn" data-piece="knight">♘</button>
             </div>
         </div>
     </div>
