@@ -54,10 +54,59 @@ h1 {
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(10px);
     border-radius: 20px;
-    padding: 20px;
+    padding: 30px;
     box-shadow: 0 8px 32px rgba(0,0,0,0.1);
     border: 1px solid rgba(255, 255, 255, 0.2);
-    display: inline-block;
+}
+
+#gameScreen {
+    padding: 0;
+    background: none;
+    backdrop-filter: none;
+    border: none;
+    box-shadow: none;
+}
+
+.hidden {
+    display: none;
+}
+
+/* Difficulty Screen */
+.difficulty-buttons {
+    display: grid;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.difficulty-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 15px;
+    padding: 20px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    position: relative;
+    touch-action: manipulation;
+}
+
+.difficulty-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.level-name {
+    font-size: 1.4rem;
+    font-weight: bold;
+}
+
+.level-desc {
+    font-size: 0.9rem;
+    opacity: 0.8;
 }
 
 #game-board {
