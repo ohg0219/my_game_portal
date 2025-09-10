@@ -20,6 +20,7 @@
 
     this.powerUpMessage = "";
     this.powerUpMessageTimer = 0;
+    this.backgroundColor = "#000000";
 
     this.ship = new BHGame.Ship([Game.DIM_X / 2, Game.DIM_Y - 50], this);
 
@@ -65,7 +66,7 @@
 
   Game.prototype.draw = function (ctx) {
     ctx.clearRect(0, 0, Game.DIM_X, Game.DIM_Y);
-    ctx.fillStyle = "#000000";
+    ctx.fillStyle = this.backgroundColor;
     ctx.fillRect(0, 0, Game.DIM_X, Game.DIM_Y);
 
     this.allObjects().forEach(function (object) {
@@ -97,7 +98,7 @@
     ctx.fillText("STAGE: " + this.stage, Game.DIM_X / 2, 40);
 
     if (this.bossMode) {
-        const boss = this.enemies.find(e => e instanceof BHGame.EnemyBoss);
+        const boss = this.enemies.find(e => e instanceof BHGame.EnemyBoss || e instanceof BHGame.EnemySunBoss);
         if (boss) {
             ctx.fillText(`BOSS HP: ${boss.health}`, Game.DIM_X / 2, 20);
         }
@@ -125,7 +126,7 @@
     if (object instanceof BHGame.Bullet) {
       this.bullets.splice(this.bullets.indexOf(object), 1);
     } else if (object instanceof BHGame.EnemyObject) {
-      if (object instanceof BHGame.EnemyBoss && object.health <= 0) {
+      if ((object instanceof BHGame.EnemyBoss || object instanceof BHGame.EnemySunBoss) && object.health <= 0) {
           this.startStageClear();
       }
       this.enemies.splice(this.enemies.indexOf(object), 1);
@@ -202,10 +203,14 @@
         const randomX = Math.random() * (Game.DIM_X - 50) + 25;
         const pos = [randomX, -30];
         let enemy;
-        if (Math.random() < 0.7) {
+        const rand = Math.random();
+
+        if (rand < 0.6) { // 60% chance
             enemy = new BHGame.EnemyUFO(pos, this);
-        } else {
+        } else if (rand < 0.85) { // 25% chance
             enemy = new BHGame.EnemySatellite(pos, this);
+        } else { // 15% chance
+            enemy = new BHGame.EnemySpinner(pos, this);
         }
         this.add(enemy);
     }
@@ -214,8 +219,17 @@
   Game.prototype.spawnBoss = function() {
       this.enemies = [];
       const pos = [Game.DIM_X / 2, 100];
-      const health = this.stage * 10;
-      const boss = new BHGame.EnemyBoss(pos, this, health);
+      let boss;
+
+      if (this.stage % 5 === 0) {
+          // Spawn Sun Boss every 5 stages
+          const health = this.stage * 20; // 2x HP
+          boss = new BHGame.EnemySunBoss(pos, this, health);
+      } else {
+          // Spawn regular Moon Boss
+          const health = this.stage * 10;
+          boss = new BHGame.EnemyBoss(pos, this, health);
+      }
       this.add(boss);
   }
 
@@ -230,6 +244,10 @@
       this.bossMode = false;
       this.bossSpawned = false;
       BHGame.config.baseSpeed += 0.2; // Increase difficulty
+
+      // Change background color
+      const hue = 240 + (this.stage * 10); // Start at blue and shift
+      this.backgroundColor = `hsl(${hue}, 100%, 5%)`;
   }
 
   Game.prototype.bound = function (pos) {
