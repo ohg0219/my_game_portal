@@ -243,4 +243,18 @@ h1 {
         height: 40px;
         font-size: 32px;
     }
+
+    .game-area {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .captured-pieces {
+        width: 320px;
+        height: auto;
+        min-height: 30px;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+    }
 }
