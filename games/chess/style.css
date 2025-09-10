@@ -59,14 +59,6 @@ h1 {
     border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-#gameScreen {
-    padding: 0;
-    background: none;
-    backdrop-filter: none;
-    border: none;
-    box-shadow: none;
-}
-
 .hidden {
     display: none;
 }
@@ -109,6 +101,31 @@ h1 {
     opacity: 0.8;
 }
 
+/* Promotion Screen */
+.promotion-choices {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.promotion-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+    width: 80px;
+    height: 80px;
+    font-size: 48px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.promotion-btn:hover {
+    background: rgba(255, 255, 255, 0.4);
+    transform: translateY(-2px);
+}
+
 #game-board {
     display: grid;
     grid-template-columns: repeat(8, 50px);
@@ -145,6 +162,11 @@ h1 {
 .selected {
     background-color: #6a994e !important;
     border-radius: 5px;
+}
+
+.in-check {
+    background-color: #e63946 !important;
+    box-shadow: 0 0 10px 5px #e63946;
 }
 
 .possible-move {
