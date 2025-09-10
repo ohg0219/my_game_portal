@@ -11,7 +11,7 @@
 
   var Item = window.BHGame.Item = function (pos, game) {
     this.type = ITEM_TYPES[Math.floor(Math.random() * ITEM_TYPES.length)];
-    var vel = [0, 1 * BHGame.config.baseSpeed];
+    var vel = [0, 1]; // Constant speed
 
     BHGame.MovingObject.call(
       this,

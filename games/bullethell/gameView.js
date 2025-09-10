@@ -10,13 +10,9 @@
   });
 
   GameView.MOVES = {
-    w: [0, -1],
     a: [-1, 0],
-    s: [0, 1],
     d: [1, 0],
-    arrowup: [0, -1],
     arrowleft: [-1, 0],
-    arrowdown: [0, 1],
     arrowright: [1, 0],
   };
 
