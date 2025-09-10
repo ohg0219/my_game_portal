@@ -1,6 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
     const boardElement = document.getElementById('game-board');
-    const gameInfoElement = document.querySelector('.game-info p');
+    const gameInfoElement = document.getElementById('gameMessage');
+    const capturedWhiteElement = document.getElementById('captured-white');
+    const capturedBlackElement = document.getElementById('captured-black');
     const P = 'pawn', R = 'rook', N = 'knight', B = 'bishop', Q = 'queen', K = 'king';
     const W = 'piece-white', BL = 'piece-black';
 
@@ -30,6 +32,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let possibleMoves = [];
     let currentPlayer = W;
     let isGameOver = false;
+    let whiteCaptured = [];
+    let blackCaptured = [];
 
     function renderBoard() {
         boardElement.innerHTML = '';
@@ -54,6 +58,24 @@ document.addEventListener('DOMContentLoaded', () => {
             boardElement.appendChild(square);
         });
         addSquareClickListeners();
+    }
+
+    function renderCapturedPieces() {
+        capturedWhiteElement.innerHTML = '';
+        whiteCaptured.forEach(p => {
+            const pieceElement = document.createElement('span');
+            pieceElement.classList.add('piece', p.color);
+            pieceElement.textContent = pieceSymbols[p.color][p.piece];
+            capturedWhiteElement.appendChild(pieceElement);
+        });
+
+        capturedBlackElement.innerHTML = '';
+        blackCaptured.forEach(p => {
+            const pieceElement = document.createElement('span');
+            pieceElement.classList.add('piece', p.color);
+            pieceElement.textContent = pieceSymbols[p.color][p.piece];
+            capturedBlackElement.appendChild(pieceElement);
+        });
     }
 
     function handleSquareClick(e) {
@@ -117,12 +139,22 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function movePiece(from, to) {
+        const capturedPiece = boardState[to];
+        if (capturedPiece) {
+            if (capturedPiece.color === BL) {
+                whiteCaptured.push(capturedPiece);
+            } else {
+                blackCaptured.push(capturedPiece);
+            }
+        }
+
         const piece = boardState[from];
         boardState[to] = piece;
         boardState[from] = null;
 
         clearSelection();
         renderBoard();
+        renderCapturedPieces();
 
         currentPlayer = (currentPlayer === W) ? BL : W;
         updateGameInfo();
@@ -433,6 +465,19 @@ document.addEventListener('DOMContentLoaded', () => {
         squares.forEach(sq => sq.addEventListener('click', handleSquareClick));
     }
 
-    renderBoard();
-    updateGameInfo();
+    function resetGame() {
+        boardState = initialBoard.map(p => p ? {...p} : null);
+        currentPlayer = W;
+        isGameOver = false;
+        whiteCaptured = [];
+        blackCaptured = [];
+        clearSelection();
+        renderBoard();
+        renderCapturedPieces();
+        updateGameInfo();
+    }
+
+    document.getElementById('newGameBtn').addEventListener('click', resetGame);
+
+    resetGame(); // Initial setup
 });

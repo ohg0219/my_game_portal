@@ -16,11 +16,16 @@
         <h1>♟️ 체스 게임 (VS AI)</h1>
 
         <div class="screen">
-            <div id="game-board"></div>
+            <div class="game-area">
+                <div id="captured-white" class="captured-pieces"></div>
+                <div id="game-board"></div>
+                <div id="captured-black" class="captured-pieces"></div>
+            </div>
         </div>
 
         <div class="game-info">
-             <p>플레이어(백)의 차례입니다.</p>
+             <p id="gameMessage">플레이어(백)의 차례입니다.</p>
+             <button id="newGameBtn" class="control-btn">새 게임</button>
         </div>
     </div>
     <script src="script.js"></script>

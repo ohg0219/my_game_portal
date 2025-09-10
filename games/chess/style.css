@@ -112,10 +112,58 @@ h1 {
     background-color: #b58863;
 }
 
+.game-area {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.captured-pieces {
+    width: 60px;
+    height: 400px;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    font-size: 24px;
+    padding: 5px;
+    background: rgba(0,0,0,0.1);
+    border-radius: 5px;
+}
+
+.captured-pieces .piece {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .game-info {
     margin-top: 20px;
     font-size: 1.2rem;
     font-weight: bold;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.control-btn {
+    background: linear-gradient(45deg, #fd79a8, #e84393);
+    border: none;
+    border-radius: 25px;
+    padding: 10px 20px;
+    color: white;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    touch-action: manipulation;
+}
+
+.control-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(232, 67, 147, 0.4);
 }
 
 @media (max-width: 480px) {
