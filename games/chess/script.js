@@ -1,4 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
+    const difficultyScreen = document.getElementById('difficultyScreen');
+    const gameScreen = document.getElementById('gameScreen');
     const boardElement = document.getElementById('game-board');
     const gameInfoElement = document.getElementById('gameMessage');
     const capturedWhiteElement = document.getElementById('captured-white');
@@ -26,6 +28,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    const pieceValues = { [P]: 1, [N]: 3, [B]: 3, [R]: 5, [Q]: 9, [K]: 100 };
+
     let boardState = [...initialBoard];
     let selectedPiece = null;
     let selectedPieceElement = null;
@@ -34,6 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let isGameOver = false;
     let whiteCaptured = [];
     let blackCaptured = [];
+    let aiDifficulty = 'beginner';
 
     function renderBoard() {
         boardElement.innerHTML = '';
@@ -205,16 +210,74 @@ document.addEventListener('DOMContentLoaded', () => {
             if (piece && piece.color === BL) {
                 const moves = getValidMoves(piece, i);
                 moves.forEach(to => {
-                    allPossibleMoves.push({ from: i, to });
+                    allPossibleMoves.push({ from: i, to, piece: piece });
                 });
             }
         }
 
-        if (allPossibleMoves.length > 0) {
-            const randomMove = allPossibleMoves[Math.floor(Math.random() * allPossibleMoves.length)];
-            movePiece(randomMove.from, randomMove.to);
+        if (allPossibleMoves.length === 0) {
+            return; // Should be caught by checkGameOver, but as a safeguard.
         }
-        // The case of no moves is handled by checkGameOver now.
+
+        let bestMove;
+
+        switch (aiDifficulty) {
+            case 'beginner':
+                bestMove = allPossibleMoves[Math.floor(Math.random() * allPossibleMoves.length)];
+                break;
+
+            case 'intermediate':
+                let bestCaptureValue = -1;
+                let potentialMoves = [];
+                for (const move of allPossibleMoves) {
+                    const capturedPiece = boardState[move.to];
+                    if (capturedPiece) {
+                        const captureValue = pieceValues[capturedPiece.piece];
+                        if (captureValue > bestCaptureValue) {
+                            bestCaptureValue = captureValue;
+                            potentialMoves = [move];
+                        } else if (captureValue === bestCaptureValue) {
+                            potentialMoves.push(move);
+                        }
+                    }
+                }
+
+                if (potentialMoves.length > 0) {
+                    bestMove = potentialMoves[Math.floor(Math.random() * potentialMoves.length)];
+                } else {
+                    bestMove = allPossibleMoves[Math.floor(Math.random() * allPossibleMoves.length)];
+                }
+                break;
+
+            case 'expert':
+                let bestScore = -Infinity;
+                let expertMoves = [];
+                for (const move of allPossibleMoves) {
+                    let score = 0;
+                    // Evaluate captures
+                    const capturedPiece = boardState[move.to];
+                    if (capturedPiece) {
+                        score += pieceValues[capturedPiece.piece];
+                    }
+
+                    // Avoid moving into an attacked square
+                    const opponentColor = W;
+                    if (isSquareAttacked(move.to, opponentColor)) {
+                        score -= pieceValues[move.piece.piece] / 2; // Penalize moving to a threatened square
+                    }
+
+                    if (score > bestScore) {
+                        bestScore = score;
+                        expertMoves = [move];
+                    } else if (score === bestScore) {
+                        expertMoves.push(move);
+                    }
+                }
+                bestMove = expertMoves[Math.floor(Math.random() * expertMoves.length)];
+                break;
+        }
+
+        movePiece(bestMove.from, bestMove.to);
     }
 
     function updateGameInfo() {
@@ -465,7 +528,11 @@ document.addEventListener('DOMContentLoaded', () => {
         squares.forEach(sq => sq.addEventListener('click', handleSquareClick));
     }
 
-    function resetGame() {
+    function setupGame(level) {
+        aiDifficulty = level;
+        difficultyScreen.classList.add('hidden');
+        gameScreen.classList.remove('hidden');
+
         boardState = initialBoard.map(p => p ? {...p} : null);
         currentPlayer = W;
         isGameOver = false;
@@ -477,7 +544,19 @@ document.addEventListener('DOMContentLoaded', () => {
         updateGameInfo();
     }
 
-    document.getElementById('newGameBtn').addEventListener('click', resetGame);
+    function resetGame() {
+        gameScreen.classList.add('hidden');
+        difficultyScreen.classList.remove('hidden');
+    }
 
-    resetGame(); // Initial setup
+    function init() {
+        document.querySelectorAll('.difficulty-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                setupGame(btn.dataset.level);
+            });
+        });
+        document.getElementById('newGameBtn').addEventListener('click', resetGame);
+    }
+
+    init();
 });
