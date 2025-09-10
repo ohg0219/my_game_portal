@@ -2,8 +2,8 @@
   window.BHGame = window.BHGame || {};
 
   var EnemyBoss = window.BHGame.EnemyBoss = function (pos, game, health) {
-    var speed = 2 * BHGame.config.baseSpeed * BHGame.config.enemySpeedMultiplier;
-    var vel = [speed, 0]; // Start moving right
+    var speed = 2 * BHGame.config.enemySpeedMultiplier;
+    var vel = [speed, 0];
     BHGame.EnemyObject.call(
       this,
       pos,
@@ -12,12 +12,14 @@
       EnemyBoss.RADIUS,
       'white',
       game,
-      1000 // Score
+      1000
     );
-    this.isBounded = true; // Stay on screen
+    this.isBounded = true;
+    this.targetPosition = null;
+    this.setNewTarget();
   };
 
-  EnemyBoss.RADIUS = 30; // 2x UFO size
+  EnemyBoss.RADIUS = 30;
 
   BHGame.Util.inherits(EnemyBoss, BHGame.EnemyObject);
 
@@ -29,23 +31,47 @@
     ctx.fillText("🌕", this.pos[0], this.pos[1]);
   };
 
-  EnemyBoss.prototype.move = function(delta) {
-    // Standard move updates position based on velocity
-    BHGame.MovingObject.prototype.move.call(this, delta);
+  EnemyBoss.prototype.setNewTarget = function() {
+      const x = Math.random() * (BHGame.Game.DIM_X - EnemyBoss.RADIUS * 2) + EnemyBoss.RADIUS;
+      const y = Math.random() * (BHGame.Game.DIM_Y / 3) + EnemyBoss.RADIUS;
+      this.targetPosition = [x, y];
+  }
 
-    // Bounce off the sides
-    if (this.pos[0] - this.radius < 0) {
-        this.vel[0] = -this.vel[0];
-        this.pos[0] = this.radius;
-    } else if (this.pos[0] + this.radius > BHGame.Game.DIM_X) {
-        this.vel[0] = -this.vel[0];
-        this.pos[0] = BHGame.Game.DIM_X - this.radius;
+  EnemyBoss.prototype.fireBullet = function () {
+    const spreadAngle = 15; // degrees
+    for (let i = -1; i <= 1; i++) {
+        const angle = 180 + (i * spreadAngle); // 180 is downward
+        const rad = angle * (Math.PI / 180);
+        const speed = 3 * BHGame.config.enemySpeedMultiplier;
+        const vel = [Math.sin(rad) * speed, -Math.cos(rad) * speed];
+        const bullet = new BHGame.EnemyBullet(this.pos.slice(), vel, this.game);
+        this.game.add(bullet);
     }
+  };
+
+  EnemyBoss.prototype.move = function(delta) {
+    const dist = Math.sqrt(
+        Math.pow(this.pos[0] - this.targetPosition[0], 2) +
+        Math.pow(this.pos[1] - this.targetPosition[1], 2)
+    );
+
+    if (dist < 10) {
+        this.setNewTarget();
+    }
+
+    const angle = Math.atan2(
+        this.targetPosition[1] - this.pos[1],
+        this.targetPosition[0] - this.pos[0]
+    );
+    const speed = 2 * BHGame.config.enemySpeedMultiplier;
+    this.vel = [Math.cos(angle) * speed, Math.sin(angle) * speed];
+
+    BHGame.MovingObject.prototype.move.call(this, delta);
 
     // Fire bullets
     this.fireTimer += delta;
     if (this.fireTimer > this.fireRate) {
-        this.fireBullet(); // Uses the parent fireBullet method
+        this.fireBullet();
         this.fireTimer = 0;
     }
   }
