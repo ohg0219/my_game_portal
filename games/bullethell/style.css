@@ -149,12 +149,10 @@ canvas {
 }
 
 .d-pad {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(3, 1fr);
-    width: 150px;
-    height: 150px;
-    gap: 5px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    width: 100%;
 }
 
 .control-btn {
@@ -174,21 +172,9 @@ canvas {
     background: rgba(255, 255, 255, 0.4);
 }
 
-.d-pad .control-btn[data-direction="w"] { grid-column: 2; grid-row: 1; }
-.d-pad .control-btn[data-direction="a"] { grid-column: 1; grid-row: 2; }
-.d-pad .control-btn[data-direction="s"] { grid-column: 2; grid-row: 2; }
-.d-pad .control-btn[data-direction="d"] { grid-column: 3; grid-row: 2; }
-
-.action-buttons {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.fire-btn {
+.d-pad .control-btn {
     width: 80px;
     height: 80px;
-    font-size: 2rem;
 }
 
 /* Responsive Design */

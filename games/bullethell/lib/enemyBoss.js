@@ -34,8 +34,12 @@
     BHGame.MovingObject.prototype.move.call(this, delta);
 
     // Bounce off the sides
-    if (this.pos[0] - this.radius < 0 || this.pos[0] + this.radius > BHGame.Game.DIM_X) {
+    if (this.pos[0] - this.radius < 0) {
         this.vel[0] = -this.vel[0];
+        this.pos[0] = this.radius;
+    } else if (this.pos[0] + this.radius > BHGame.Game.DIM_X) {
+        this.vel[0] = -this.vel[0];
+        this.pos[0] = BHGame.Game.DIM_X - this.radius;
     }
 
     // Fire bullets

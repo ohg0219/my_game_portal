@@ -126,7 +126,8 @@
   Ship.prototype.power = function(impulse) {
     if (this.isDying) return;
     this.vel[0] += impulse[0] * 0.3;
-    this.vel[1] += impulse[1] * 0.3;
+    // No vertical movement
+    // this.vel[1] += impulse[1] * 0.3;
   };
 
   Ship.prototype.fireBullet = function() {
