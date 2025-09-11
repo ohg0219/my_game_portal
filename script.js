@@ -24,6 +24,11 @@ async function loadGameStats() {
             .eq('id', 1)
             .single();
 
+        // "No rows found"는 에러가 아니므로 정상 처리
+        if (error && error.code !== 'PGRST116') {
+            throw error;
+        }
+
         // 데이터가 성공적으로 로드되면, 로컬 상태 업데이트
         if (data && data.stats) {
             gameStats = {
