@@ -4,14 +4,7 @@
 const defaultGameStats = {
     totalPlays: 0,
     favoriteGame: '-',
-    gamePlayCounts: {
-        snake: 0,
-        memory: 0,
-        '2048': 0,
-        bullethell: 0,
-        sudoku: 0,
-        chess: 0
-    }
+    gamePlayCounts: {}
 };
 
 let gameStats = { ...defaultGameStats };
@@ -24,7 +17,6 @@ async function loadGameStats() {
         updateStatsDisplay();
         return;
     }
-
     try {
         const { data, error } = await window.supabase
             .from('portal_stats')
@@ -32,12 +24,8 @@ async function loadGameStats() {
             .eq('id', 1)
             .single();
 
-        if (error && error.code !== 'PGRST116') { // PGRST116: 'exact one row not found'
-            throw error;
-        }
-
+        // 데이터가 성공적으로 로드되면, 로컬 상태 업데이트
         if (data && data.stats) {
-            // DB에 저장된 값과 기본 구조를 병합하여 새로운 게임이 추가되어도 오류가 없도록 함
             gameStats = {
                 ...defaultGameStats,
                 ...data.stats,
@@ -46,29 +34,13 @@ async function loadGameStats() {
                     ...(data.stats.gamePlayCounts || {})
                 }
             };
-        } else {
-            // 데이터가 없는 경우, 기본값으로 DB에 새로 생성
-            console.log('No stats found on server, creating initial record.');
-            await createInitialStats();
         }
+        // 에러가 발생해도 (예: 행이 없음) 기본 통계로 UI를 그냥 표시
+
     } catch (error) {
         console.error('Error loading game stats:', error);
     }
     updateStatsDisplay();
-}
-
-// 초기 통계 데이터를 DB에 생성
-async function createInitialStats() {
-    if (!window.supabase) return;
-    try {
-        const { error } = await window.supabase
-            .from('portal_stats')
-            .insert({ id: 1, stats: defaultGameStats });
-        if (error) throw error;
-        gameStats = { ...defaultGameStats };
-    } catch(error) {
-        console.error('Error creating initial stats:', error);
-    }
 }
 
 // 통계 표시 업데이트
@@ -77,93 +49,54 @@ function updateStatsDisplay() {
     document.getElementById('favoriteGame').textContent = gameStats.favoriteGame || '-';
 }
 
-// 게임 플레이 수 증가 및 Supabase에 저장
-async function incrementGamePlay(gameName) {
-    if (!gameStats.gamePlayCounts.hasOwnProperty(gameName)) {
-        console.warn(`Game "${gameName}" is not tracked in stats.`);
-        // 동적으로 게임 추가
-        gameStats.gamePlayCounts[gameName] = 0;
-    }
+// 클릭/이동 처리 및 통계 전송
+function handleGameNavigation(cardElement) {
+    if (!cardElement) return;
 
-    gameStats.totalPlays++;
-    gameStats.gamePlayCounts[gameName]++;
-    
-    // 가장 많이 플레이한 게임 찾기
-    let maxPlays = 0;
-    let favorite = '-';
-    for (const [game, count] of Object.entries(gameStats.gamePlayCounts)) {
-        if (count > maxPlays) {
-            maxPlays = count;
-            favorite = getGameDisplayName(game);
+    const gameName = cardElement.dataset.game;
+    const href = cardElement.dataset.href;
+
+    if (gameName && href) {
+        // Edge Function URL 가져오기
+        const functionUrl = `${window.supabase.functionsUrl}/update-stats`;
+
+        // sendBeacon으로 데이터 전송
+        const payload = { gameName: gameName };
+        const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
+
+        // sendBeacon은 페이지를 떠나도 데이터 전송을 보장함
+        if (navigator.sendBeacon) {
+            navigator.sendBeacon(functionUrl, blob);
+        } else {
+            // sendBeacon을 지원하지 않는 구형 브라우저를 위한 폴백 (UX 저하 발생)
+            fetch(functionUrl, {
+                method: 'POST',
+                body: blob,
+                keepalive: true
+            });
         }
-    }
-    gameStats.favoriteGame = favorite;
-    
-    // 로컬 UI 즉시 업데이트
-    updateStatsDisplay();
 
-    // Supabase에 비동기적으로 저장
-    if (!window.supabase) return;
-    try {
-        const { error } = await window.supabase
-            .from('portal_stats')
-            .update({ stats: gameStats })
-            .eq('id', 1);
-        if (error) throw error;
-    } catch (error) {
-        console.error('Error saving game stats:', error);
+        // 즉시 페이지 이동
+        window.location.href = href;
     }
-}
-
-// 게임 이름을 표시용으로 변환
-function getGameDisplayName(gameName) {
-    const names = {
-        'snake': '스네이크',
-        'memory': '메모리',
-        '2048': '2048',
-        'bullethell': '탄막 슈팅',
-        'sudoku': '스도쿠',
-        'chess': '체스'
-    };
-    return names[gameName] || gameName;
 }
 
 // 게임 카드 클릭 효과
 function addClickEffects() {
     document.querySelectorAll('.game-card').forEach(card => {
-        card.addEventListener('click', async function(e) {
-            if (this.querySelector('button[disabled]')) {
-                e.preventDefault();
-                return;
-            }
-            
-            this.style.transform = 'scale(0.95)';
-            setTimeout(() => {
-                this.style.transform = '';
-            }, 150);
-            
-            const href = this.getAttribute('onclick');
-            if (!href) return;
-
-            let gameName = null;
-            if (href.includes('snake')) gameName = 'snake';
-            else if (href.includes('memory')) gameName = 'memory';
-            else if (href.includes('2048')) gameName = '2048';
-            else if (href.includes('bullethell')) gameName = 'bullethell';
-            else if (href.includes('sudoku')) gameName = 'sudoku';
-            else if (href.includes('chess')) gameName = 'chess';
-
-            if (gameName) {
-                await incrementGamePlay(gameName);
-            }
+        card.addEventListener('click', function(e) {
+            if (this.querySelector('button[disabled]')) return;
+            if (e.target.tagName === 'A') return;
+            handleGameNavigation(this);
         });
-        
+
         card.addEventListener('mouseenter', function() {
             if (!this.querySelector('button[disabled]')) {
+                this.style.transition = 'transform 0.2s ease-out';
                 this.style.transform = 'translateY(-10px)';
             }
         });
-        
+
         card.addEventListener('mouseleave', function() {
             this.style.transform = '';
         });
@@ -174,11 +107,10 @@ function addClickEffects() {
 function addPlayButtonEvents() {
     document.querySelectorAll('.play-button').forEach(button => {
         button.addEventListener('click', function(e) {
-            if (!this.disabled) {
-                e.stopPropagation();
-                this.style.transform = 'scale(0.9)';
-                setTimeout(() => { this.style.transform = ''; }, 100);
-            }
+            e.preventDefault();
+            if (this.disabled) return;
+            const card = this.closest('.game-card');
+            handleGameNavigation(card);
         });
     });
 }
@@ -186,33 +118,13 @@ function addPlayButtonEvents() {
 // 키보드 단축키
 function addKeyboardShortcuts() {
     document.addEventListener('keydown', function(e) {
+        if (['INPUT', 'TEXTAREA'].includes(e.target.tagName)) return;
         if (e.key >= '1' && e.key <= '6') {
-            const gameLinks = [
-                'games/snake/index.html',
-                'games/memory/index.html',
-                'games/2048/index.html',
-                'games/bullethell/index.html',
-                'games/sudoku/index.html',
-                'games/chess/index.html'
-            ];
+            e.preventDefault();
             const index = parseInt(e.key) - 1;
-            if (gameLinks[index]) {
-                // 게임으로 이동하기 전에 통계를 먼저 저장
-                const card = document.querySelectorAll('.game-card')[index];
-                const href = card.getAttribute('onclick');
-                let gameName = null;
-                if (href.includes('snake')) gameName = 'snake';
-                else if (href.includes('memory')) gameName = 'memory';
-                else if (href.includes('2048')) gameName = '2048';
-                else if (href.includes('bullethell')) gameName = 'bullethell';
-                else if (href.includes('sudoku')) gameName = 'sudoku';
-                else if (href.includes('chess')) gameName = 'chess';
-
-                if(gameName) {
-                    incrementGamePlay(gameName).then(() => {
-                        window.location.href = gameLinks[index];
-                    });
-                }
+            const card = document.querySelectorAll('.game-card')[index];
+            if (card && !card.querySelector('button[disabled]')) {
+                handleGameNavigation(card);
             }
         }
     });
@@ -248,6 +160,5 @@ document.addEventListener('DOMContentLoaded', initGamePortal);
 
 // 외부에서 호출 가능한 함수들 (필요시)
 window.gamePortal = {
-    incrementGamePlay,
     loadGameStats,
 };
