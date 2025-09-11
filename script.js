@@ -58,6 +58,16 @@ function updateStatsDisplay() {
 function handleGameNavigation(cardElement) {
     if (!cardElement) return;
 
+    // 중복 클릭 방지를 위해 버튼을 즉시 비활성화
+    const button = cardElement.querySelector('.play-button');
+    if (button && button.disabled) {
+        return; // 이미 처리 중인 경우 함수 종료
+    }
+    if (button) {
+        button.disabled = true;
+        button.textContent = '로딩중...'; // 사용자에게 상태 알림
+    }
+
     const gameName = cardElement.dataset.game;
     const href = cardElement.dataset.href;
 
@@ -159,6 +169,22 @@ async function initGamePortal() {
         }, 1000);
     }
 }
+
+// 뒤로가기 캐시(bfcache)에서 페이지 로드 시 버튼 상태 초기화
+function resetGameButtons() {
+    document.querySelectorAll('.play-button:disabled').forEach(button => {
+        if (button.textContent === '로딩중...') {
+            button.disabled = false;
+            button.textContent = '플레이하기';
+        }
+    });
+}
+
+// pageshow 이벤트는 사용자가 페이지를 다시 방문할 때마다 발생 (뒤로가기 포함)
+window.addEventListener('pageshow', function(event) {
+    // event.persisted가 true이면 bfcache에서 페이지가 로드된 것
+    resetGameButtons();
+});
 
 // 페이지 로드시 초기화
 document.addEventListener('DOMContentLoaded', initGamePortal);
