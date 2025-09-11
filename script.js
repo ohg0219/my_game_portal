@@ -24,6 +24,11 @@ async function loadGameStats() {
             .eq('id', 1)
             .single();
 
+        // "No rows found"는 에러가 아니므로 정상 처리
+        if (error && error.code !== 'PGRST116') {
+            throw error;
+        }
+
         // 데이터가 성공적으로 로드되면, 로컬 상태 업데이트
         if (data && data.stats) {
             gameStats = {
@@ -50,8 +55,7 @@ function updateStatsDisplay() {
 }
 
 // 클릭/이동 처리 및 통계 전송
-// For debugging CORS issues, temporarily changed to async/await fetch to get error messages.
-async function handleGameNavigation(cardElement) {
+function handleGameNavigation(cardElement) {
     if (!cardElement) return;
 
     const gameName = cardElement.dataset.game;
@@ -65,18 +69,19 @@ async function handleGameNavigation(cardElement) {
         const payload = { gameName: gameName };
         const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
 
-        try {
-            console.log('Attempting fetch for debugging purposes...');
-            await fetch(functionUrl, {
+        // sendBeacon은 페이지를 떠나도 데이터 전송을 보장함
+        if (navigator.sendBeacon) {
+            navigator.sendBeacon(functionUrl, blob);
+        } else {
+            // sendBeacon을 지원하지 않는 구형 브라우저를 위한 폴백 (UX 저하 발생)
+            fetch(functionUrl, {
                 method: 'POST',
                 body: blob,
+                keepalive: true
             });
-            console.log('Fetch succeeded for debugging.');
-        } catch (error) {
-            console.error('CORS or Network Error (This is the message we need):', error);
         }
 
-        // 페이지 이동
+        // 즉시 페이지 이동
         window.location.href = href;
     }
 }
